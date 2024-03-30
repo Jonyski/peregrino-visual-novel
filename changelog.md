@@ -16,7 +16,7 @@
 
 - Isa (the girlfriend)
 
-### BOSSES (EX-BOYFRIENDS)
+### Bosses (ex-boyfriends)
 
 - Djamba man
 - Athlete
@@ -26,7 +26,7 @@
 - The Guidorizzi Hamilton Luiz
 - Oda
 
-## Lore
+## LORE
 
 You wake up as an SI student in the first week of classes and you have a crush on an e-girl classmate (Isa) that you met in the university's introduction week. She has 7 ex-boyfriends that are obsessed with her. You need to fight them to get closer to her.
 
