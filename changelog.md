@@ -61,21 +61,21 @@ You and the vegan guy are next to each other at the RU line. You, as aways, choo
 
 Each juice either gives you a buff or a debuff, so you have to choose the best juice (uva grape)
 
-### If you choose the CB
+### If you choose the CB:
 
 The Panelas promoter tries to sell you a Panelas ticket, you try to refuse but realizes you need to go there saturday to defeat him at a great fashion.
 
 You need to do minigames to gather money to afford the ticket.
 
-### If you choose the SI lab
+### If you choose the SI lab:
 
 You encounter the SI nerd having a hard time solving a C bug, he asks you for help, if you solve it first try he is insta-killed, but if you don't, the bossfight starts
 
-### If you choose the library
+### If you choose the library:
 
 Luiz Hamilton Guidorizzi is there, standing menancingly as he solves 60 calculations per second. You get scared, and try to run away, but he calculates your route and expands his domain (Um curso de cálculo vol. 1). Bossfight starts.
 
-### If you choose the cheese
+### If you choose the cheese:
 
 Oda is transcending at the cheese, levitating, having the time of his life, reaching nirvana, finding the real life One Piece, if you may. You get closer, and as his aura starts to burn your face he notices your presence, which disturbs him from his "queijo moment". Get ready to die.
 
