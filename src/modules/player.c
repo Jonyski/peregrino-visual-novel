@@ -27,6 +27,8 @@ struct Player *createPlayer(char name[16]) {
 	for(int i = 0; i < INVENTORY_SIZE; i++){
 		player->items[i] = NULL;
 	}
+
+	return player;
 }
 
 void killPlayer(struct Player *p) {
