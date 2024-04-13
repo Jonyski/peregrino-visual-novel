@@ -6,5 +6,7 @@
 #endif
 
 struct NPC;
+struct NPC *createNPC(char *name, int hp, void (*attack)(char *));
+void killNPC(struct NPC *npc);
 
 #endif
