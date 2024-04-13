@@ -22,6 +22,7 @@ struct Player *createPlayer() {
 	player->hp = INITIAL_HP;
 	player->items = malloc(INVENTORY_SIZE * sizeof(struct Item *));
 	if(player->items == NULL) {
+		free(player);
 		return NULL; // failed to allocate items
 	}
 	for(int i = 0; i < INVENTORY_SIZE; i++){
