@@ -12,7 +12,7 @@ struct Player {
 	struct Item **items;
 };
 
-struct Player *createPlayer(char name[16]) {
+struct Player *createPlayer() {
 	struct Player *player = malloc(sizeof(struct Player));
 	if(player == NULL) {
 		return NULL; // failed to allocate player

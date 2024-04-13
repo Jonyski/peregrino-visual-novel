@@ -2,7 +2,7 @@
 #define PLAYER_H
 
 struct Player;
-struct Player *createPlayer(char name[16]);
+struct Player *createPlayer();
 void killPlayer(struct Player *p);
 
 #endif
