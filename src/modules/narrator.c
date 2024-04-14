@@ -19,9 +19,9 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 
 int getNumberOfLines(char *filePath) {
 	FILE *file = fopen(filePath, "r");
-	char buffer[256];
+	char buffer[1024];
 	int numOfLines = 0;
-	while(fgets(buffer, 256, file)) {
+	while(fgets(buffer, 1024, file)) {
 		numOfLines++;
 	}
 	fclose(file);
@@ -48,7 +48,7 @@ struct Narrator *createNarrator() {
 	}
 
 	char **script = malloc(numOfLines * sizeof(char *));
-	char buffer[256];
+	char buffer[1024];
 	int currLine = 0;
 	while(fgets(buffer, sizeof(buffer), scriptFile) && currLine < numOfLines) {
 		script[currLine] = malloc(strlen(buffer) + 1);
