@@ -1,7 +1,14 @@
-#ifndef NARATOR_H
-#define NARATOR_H
+#ifndef NARRATOR_H
+#define NARRATOR_H
 
-struct Narator;
-void narrate(char *nextLine, bool shouldClear);
+struct Narrator {
+	int nextLine;
+	int amountOfLines;
+	char **script;
+};
+void narrate(struct Narrator *, bool);
+int getNumberOfLines(char *);
+void killNarrator(struct Narrator *);
+struct Narrator *createNarrator();
 
 #endif
