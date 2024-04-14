@@ -12,7 +12,8 @@ int main(int argc, char const *argv[]) {
 
 	struct Narrator *narrator = createNarrator();
 	for(int i = 0; i < narrator->amountOfLines; i++) {
-		narrate(narrator, false);
+		narrate(narrator, true);
+		pause;
 	}
 	killNarrator(narrator);
 }

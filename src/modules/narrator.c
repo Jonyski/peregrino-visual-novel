@@ -6,7 +6,12 @@
 
 void narrate(struct Narrator *narrator, bool shouldClear) {
 	if(shouldClear) {
-		system("clear");
+		#ifdef _WIN32
+			char *clearTerminal = "cls";
+		#else 
+			char *clearTerminal = "clear";
+		#endif
+		system(clearTerminal);
 	}
 	printf("%s\n", narrator->script[narrator->nextLine]);
 	narrator->nextLine++;
