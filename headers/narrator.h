@@ -1,6 +1,8 @@
 #ifndef NARRATOR_H
 #define NARRATOR_H
 
+#include <stdbool.h>
+
 struct Narrator {
 	int nextLine;
 	int amountOfLines;
