@@ -5,7 +5,7 @@
 #include <locale.h>
 #include "narrator.h"
 
-#define pause do { while (getchar() != '\n'); } while (0)
+#define pause while (getchar() != '\n'); 
 
 int main(int argc, char const *argv[]) {
 	setlocale(LC_ALL, "");

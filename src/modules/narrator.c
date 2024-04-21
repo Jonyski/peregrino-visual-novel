@@ -1,8 +1,8 @@
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "narrator.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void narrate(struct Narrator *narrator, bool shouldClear) {
 	if(shouldClear) {
@@ -70,9 +70,9 @@ struct Narrator *createNarrator() {
 }
 
 void killNarrator(struct Narrator *narrator) {
-	for(int i = 0; i < narrator->amountOfLines; i++) {
-		free(narrator->script[i]);
-	}
-	free(narrator->script);
-	free(narrator);
+  for (int i = 0; i < narrator->amountOfLines; i++) {
+    free(narrator->script[i]);
+  }
+  free(narrator->script);
+  free(narrator);
 }
