@@ -2,3 +2,5 @@
 *.exe
 
 .vscode
+.clangd
+compile_flags.txt
