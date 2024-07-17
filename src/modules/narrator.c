@@ -8,7 +8,7 @@
 #include "narrator.h"
 #include "utils.h"
 
-volatile int shouldSkip = 0; // for allowing the slow printing to be fast-forwarded
+volatile int shouldSkip = false; // for allowing the slow printing to be fast-forwarded
 
 struct Narrator createNarrator() {
 	struct Narrator narrator;
@@ -54,18 +54,25 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 	}
 	slowPrint(narrator->script[narrator->nextLine]);
 	narrator->nextLine++;
-	pause;
+	if(!shouldSkip) {
+		pause;
+	}
 }
 
 void slowPrint(char *str) {
+	// changing terminal configurations to read input discreetly
 	struct termios old_conf, new_conf;
 	tcgetattr(STDIN_FILENO, &old_conf);
 	new_conf = old_conf;
 	new_conf.c_lflag &= ~(ICANON | ECHO); // turns off canon mode and input echo
 	tcsetattr(STDIN_FILENO, TCSANOW, &new_conf);
 
+	// creating a thread that may fast-forward the slow printing;
+	// this thread accesses the volatile variables defined in the beggining of this file
 	pthread_t checkInterruption;
 	pthread_create(&checkInterruption, NULL, checkInterrupt, NULL);
+	shouldSkip = false;
+
 	while(*str) {
 		if(shouldSkip) {
 			printf("%s", str);
@@ -80,9 +87,8 @@ void slowPrint(char *str) {
 		}
 		usleep((randomFloat * 15 + 20) * 1000);
 	}
+	shouldSkip = false;
 	pthread_join(checkInterruption, NULL);
-	shouldSkip = 0;
-
 	tcsetattr(STDIN_FILENO, TCSANOW, &old_conf);
 }
 
@@ -90,7 +96,7 @@ void *checkInterrupt(void *arg) {
 	// prints the rest of the narration line if a key is pressed
 	while(!shouldSkip) {
 		if(getchar()) {
-			shouldSkip = 1;
+			shouldSkip = true;
 		}
 	}
 }
