@@ -1,13 +1,13 @@
 CFLAGS= -Wall
 
-run: all
+run: main.out
 	@echo "Running Light Novel"
-	@./main.out
+	@./$<
 
-all: src/main.c $(wildcard modules/*.c)
+main.out: src/main.c $(wildcard src/modules/*.c)
 	@echo "Compiling the project"
-	@gcc -g src/modules/* ./src/main.c -o main.out -I ./headers
+	@gcc $(CFLAGS) -g $^ -o $@ -I ./headers
 
 clean:
 	@echo "Removing files..."
-	rm main.out
+	rm ./main.out
