@@ -10,7 +10,6 @@ struct Narrator {
 };
 void narrate(struct Narrator *, bool);
 int getNumberOfLines(char *);
-void killNarrator(struct Narrator *);
 void slowPrint(char *str);
 struct Narrator createNarrator();
 

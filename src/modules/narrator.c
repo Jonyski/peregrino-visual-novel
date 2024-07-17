@@ -8,9 +8,6 @@
 
 struct Narrator createNarrator() {
 	struct Narrator narrator;
-	//if(narrator == NULL) {
-	//	return NULL; // failed to allocate the narrator
-	//}
 
 	int numOfLines = getNumberOfLines("./texts/narratorscript.txt");
 	FILE *scriptFile = fopen("./texts/narratorscript.txt", "r");
@@ -62,13 +59,4 @@ int getNumberOfLines(char *filePath) {
 	}
 	fclose(file);
 	return numOfLines;
-}
-
-
-void killNarrator(struct Narrator *narrator) {
-	for(int i = 0; i < narrator->amountOfLines; i++) {
-		free(narrator->script[i]);
-	}
-	free(narrator->script);
-	free(narrator);
 }

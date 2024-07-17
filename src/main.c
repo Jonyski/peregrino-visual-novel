@@ -14,5 +14,4 @@ int main(int argc, char const *argv[]) {
 	for(int i = 0; i < narrator.amountOfLines; i++) {
 		narrate(&narrator, true);
 	}
-	//killNarrator(narrator);
 }
