@@ -3,16 +3,16 @@
 #include <string.h>
 #include <stdbool.h>
 #include <locale.h>
+#include <time.h>
 #include "narrator.h"
-
-#define pause do { while (getchar() != '\n'); } while (0)
 
 int main(int argc, char const *argv[]) {
 	setlocale(LC_ALL, "");
+	srand(time(NULL));
 
-	struct Narrator *narrator = createNarrator();
-	for(int i = 0; i < narrator->amountOfLines; i++) {
-		narrate(narrator, false);
+	struct Narrator narrator = createNarrator();
+	for(int i = 0; i < narrator.amountOfLines; i++) {
+		narrate(&narrator, true);
 	}
-	killNarrator(narrator);
+	//killNarrator(narrator);
 }
