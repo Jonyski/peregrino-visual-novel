@@ -1,12 +1,17 @@
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "narrator.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void narrate(struct Narrator *narrator, bool shouldClear) {
 	if(shouldClear) {
-		system("clear");
+		#ifdef _WIN32
+			char *clearTerminal = "cls";
+		#else 
+			char *clearTerminal = "clear";
+		#endif
+		system(clearTerminal);
 	}
 	printf("%s\n", narrator->script[narrator->nextLine]);
 	narrator->nextLine++;
@@ -14,9 +19,9 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 
 int getNumberOfLines(char *filePath) {
 	FILE *file = fopen(filePath, "r");
-	char buffer[256];
+	char buffer[1024];
 	int numOfLines = 0;
-	while(fgets(buffer, 256, file)) {
+	while(fgets(buffer, 1024, file)) {
 		numOfLines++;
 	}
 	fclose(file);
@@ -29,10 +34,21 @@ struct Narrator *createNarrator() {
 		return NULL; // failed to allocate the narrator
 	}
 
-	int numOfLines = getNumberOfLines("./texts/narratorscript.txt");
-	FILE *scriptFile = fopen("./texts/narratorscript.txt", "r");
+	#ifdef _WIN32
+		char *textPath = ".\\texts\\narratorscript.txt";
+	#else
+		char *textPath = "./texts/narratorscript.txt";
+	#endif
+
+	int numOfLines = getNumberOfLines(textPath);
+	FILE *scriptFile = fopen(textPath, "r");
+
+	if(scriptFile == NULL) {
+		return NULL; // failed to access script file
+	}
+
 	char **script = malloc(numOfLines * sizeof(char *));
-	char buffer[256];
+	char buffer[1024];
 	int currLine = 0;
 	while(fgets(buffer, sizeof(buffer), scriptFile) && currLine < numOfLines) {
 		script[currLine] = malloc(strlen(buffer) + 1);
@@ -54,9 +70,9 @@ struct Narrator *createNarrator() {
 }
 
 void killNarrator(struct Narrator *narrator) {
-	for(int i = 0; i < narrator->amountOfLines; i++) {
-		free(narrator->script[i]);
-	}
-	free(narrator->script);
-	free(narrator);
+  for (int i = 0; i < narrator->amountOfLines; i++) {
+    free(narrator->script[i]);
+  }
+  free(narrator->script);
+  free(narrator);
 }
