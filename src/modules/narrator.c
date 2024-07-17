@@ -1,11 +1,14 @@
-#include "narrator.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
 #include <unistd.h>
+#include <pthread.h>
 #include "narrator.h"
 #include "utils.h"
+
+volatile int shouldSkip = 0; // for allowing the slow printing to be fast-forwarded
 
 struct Narrator createNarrator() {
 	struct Narrator narrator;
@@ -20,7 +23,7 @@ struct Narrator createNarrator() {
 	FILE *scriptFile = fopen(textPath, "r");
 
 	if(scriptFile == NULL) {
-		return NULL; // failed to access script file
+		exit(1); // failed to access script file
 	}
 
 	char **script = malloc(numOfLines * sizeof(char *));
@@ -55,10 +58,40 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 }
 
 void slowPrint(char *str) {
+	struct termios old_conf, new_conf;
+	tcgetattr(STDIN_FILENO, &old_conf);
+	new_conf = old_conf;
+	new_conf.c_lflag &= ~(ICANON | ECHO); // turns off canon mode and input echo
+	tcsetattr(STDIN_FILENO, TCSANOW, &new_conf);
+
+	pthread_t checkInterruption;
+	pthread_create(&checkInterruption, NULL, checkInterrupt, NULL);
 	while(*str) {
+		if(shouldSkip) {
+			printf("%s", str);
+			break;
+		}
 		putchar(*str++);
+
+
 		fflush(stdout);
+		if(*(str - 1) == '.') {
+			usleep(300000);
+		}
 		usleep((randomFloat * 15 + 20) * 1000);
+	}
+	pthread_join(checkInterruption, NULL);
+	shouldSkip = 0;
+
+	tcsetattr(STDIN_FILENO, TCSANOW, &old_conf);
+}
+
+void *checkInterrupt(void *arg) {
+	// prints the rest of the narration line if a key is pressed
+	while(!shouldSkip) {
+		if(getchar()) {
+			shouldSkip = 1;
+		}
 	}
 }
 

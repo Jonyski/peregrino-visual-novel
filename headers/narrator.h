@@ -11,6 +11,7 @@ struct Narrator {
 void narrate(struct Narrator *, bool);
 int getNumberOfLines(char *);
 void slowPrint(char *str);
+void *checkInterrupt(void *arg);
 struct Narrator createNarrator();
 
 #endif
