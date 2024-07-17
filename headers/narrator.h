@@ -1,7 +1,7 @@
 #ifndef NARRATOR_H
 #define NARRATOR_H
 
-#define pause do { while (getchar() != '\n'); } while (0)
+#include <stdbool.h>
 
 struct Narrator {
 	int nextLine;

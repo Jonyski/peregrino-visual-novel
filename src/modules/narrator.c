@@ -1,6 +1,7 @@
+#include "narrator.h"
 #include <stdbool.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include "narrator.h"
@@ -9,10 +10,21 @@
 struct Narrator createNarrator() {
 	struct Narrator narrator;
 
-	int numOfLines = getNumberOfLines("./texts/narratorscript.txt");
-	FILE *scriptFile = fopen("./texts/narratorscript.txt", "r");
+	#ifdef _WIN32
+		char *textPath = ".\\texts\\narratorscript.txt";
+	#else
+		char *textPath = "./texts/narratorscript.txt";
+	#endif
+
+	int numOfLines = getNumberOfLines(textPath);
+	FILE *scriptFile = fopen(textPath, "r");
+
+	if(scriptFile == NULL) {
+		return NULL; // failed to access script file
+	}
+
 	char **script = malloc(numOfLines * sizeof(char *));
-	char buffer[256];
+	char buffer[1024];
 	int currLine = 0;
 	while(fgets(buffer, sizeof(buffer), scriptFile) && currLine < numOfLines) {
 		script[currLine] = malloc(strlen(buffer) + 1);
