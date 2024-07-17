@@ -10,7 +10,7 @@ int main(int argc, char const *argv[]) {
 	srand(time(NULL));
 
 	struct Narrator narrator = createNarrator();
-	for(int i = 0; i < narrator.amountOfLines; i++) {
+	for(int i = 0; i < narrator.amountOfLines - 1; i++) {
 		narrate(&narrator, true);
 	}
 }
