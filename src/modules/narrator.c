@@ -1,38 +1,17 @@
-#include "narrator.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
+#include <unistd.h>
+#include <pthread.h>
+#include "narrator.h"
+#include "utils.h"
 
-void narrate(struct Narrator *narrator, bool shouldClear) {
-	if(shouldClear) {
-		#ifdef _WIN32
-			char *clearTerminal = "cls";
-		#else 
-			char *clearTerminal = "clear";
-		#endif
-		system(clearTerminal);
-	}
-	printf("%s\n", narrator->script[narrator->nextLine]);
-	narrator->nextLine++;
-}
+volatile int shouldSkip = 0; // for allowing the slow printing to be fast-forwarded
 
-int getNumberOfLines(char *filePath) {
-	FILE *file = fopen(filePath, "r");
-	char buffer[1024];
-	int numOfLines = 0;
-	while(fgets(buffer, 1024, file)) {
-		numOfLines++;
-	}
-	fclose(file);
-	return numOfLines;
-}
-
-struct Narrator *createNarrator() {
-	struct Narrator *narrator = malloc(sizeof(struct Narrator));
-	if(narrator == NULL) {
-		return NULL; // failed to allocate the narrator
-	}
+struct Narrator createNarrator() {
+	struct Narrator narrator;
 
 	#ifdef _WIN32
 		char *textPath = ".\\texts\\narratorscript.txt";
@@ -44,7 +23,7 @@ struct Narrator *createNarrator() {
 	FILE *scriptFile = fopen(textPath, "r");
 
 	if(scriptFile == NULL) {
-		return NULL; // failed to access script file
+		exit(1); // failed to access script file
 	}
 
 	char **script = malloc(numOfLines * sizeof(char *));
@@ -53,7 +32,7 @@ struct Narrator *createNarrator() {
 	while(fgets(buffer, sizeof(buffer), scriptFile) && currLine < numOfLines) {
 		script[currLine] = malloc(strlen(buffer) + 1);
 		if(script[currLine] == NULL) {
-			return NULL; // failed to allocate the script
+			exit(1); // failed to allocate the script
 		}
 
 		strcpy(script[currLine], buffer);
@@ -62,17 +41,67 @@ struct Narrator *createNarrator() {
 	}
 	fclose(scriptFile);
 
-	narrator->nextLine = 0;
-	narrator->amountOfLines = numOfLines;
-	narrator->script = script;
+	narrator.nextLine = 0;
+	narrator.amountOfLines = numOfLines;
+	narrator.script = script;
 
 	return narrator;
 }
 
-void killNarrator(struct Narrator *narrator) {
-  for (int i = 0; i < narrator->amountOfLines; i++) {
-    free(narrator->script[i]);
-  }
-  free(narrator->script);
-  free(narrator);
+void narrate(struct Narrator *narrator, bool shouldClear) {
+	if(shouldClear) {
+		system("clear");
+	}
+	slowPrint(narrator->script[narrator->nextLine]);
+	narrator->nextLine++;
+	pause;
+}
+
+void slowPrint(char *str) {
+	struct termios old_conf, new_conf;
+	tcgetattr(STDIN_FILENO, &old_conf);
+	new_conf = old_conf;
+	new_conf.c_lflag &= ~(ICANON | ECHO); // turns off canon mode and input echo
+	tcsetattr(STDIN_FILENO, TCSANOW, &new_conf);
+
+	pthread_t checkInterruption;
+	pthread_create(&checkInterruption, NULL, checkInterrupt, NULL);
+	while(*str) {
+		if(shouldSkip) {
+			printf("%s", str);
+			break;
+		}
+		putchar(*str++);
+
+
+		fflush(stdout);
+		if(*(str - 1) == '.') {
+			usleep(300000);
+		}
+		usleep((randomFloat * 15 + 20) * 1000);
+	}
+	pthread_join(checkInterruption, NULL);
+	shouldSkip = 0;
+
+	tcsetattr(STDIN_FILENO, TCSANOW, &old_conf);
+}
+
+void *checkInterrupt(void *arg) {
+	// prints the rest of the narration line if a key is pressed
+	while(!shouldSkip) {
+		if(getchar()) {
+			shouldSkip = 1;
+		}
+	}
+}
+
+int getNumberOfLines(char *filePath) {
+	FILE *file = fopen(filePath, "r");
+	char buffer[256];
+	int numOfLines = 0;
+	while(fgets(buffer, 256, file)) {
+		numOfLines++;
+	}
+	fclose(file);
+	return numOfLines;
 }
