@@ -14,9 +14,9 @@ struct Narrator createNarrator() {
 	struct Narrator narrator;
 
 	#ifdef _WIN32
-		char *textPath = ".\\texts\\narratorscript.txt";
+		char *textPath = ".\\texts\\day1-script.txt";
 	#else
-		char *textPath = "./texts/narratorscript.txt";
+		char *textPath = "./texts/day1-script.txt";
 	#endif
 
 	int numOfLines = getNumberOfLines(textPath);
@@ -26,11 +26,11 @@ struct Narrator createNarrator() {
 		exit(1); // failed to access script file
 	}
 
-	char **script = malloc(numOfLines * sizeof(char *));
-	char buffer[1024];
+	char *script[numOfLines];
+	char buffer[2048];
 	int currLine = 0;
 	while(fgets(buffer, sizeof(buffer), scriptFile) && currLine < numOfLines) {
-		script[currLine] = malloc(strlen(buffer) + 1);
+		script[currLine] = malloc(strlen(buffer));
 		if(script[currLine] == NULL) {
 			exit(1); // failed to allocate the script
 		}
@@ -53,9 +53,11 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 		system("clear");
 	}
 	slowPrint(narrator->script[narrator->nextLine]);
-	narrator->nextLine++;
 	if(!shouldSkip) {
 		pause;
+	}
+	if(narrator->nextLine < narrator->amountOfLines){
+		narrator->nextLine++;
 	}
 }
 
@@ -68,23 +70,26 @@ void slowPrint(char *str) {
 	tcsetattr(STDIN_FILENO, TCSANOW, &new_conf);
 
 	// creating a thread that may fast-forward the slow printing;
-	// this thread accesses the volatile variables defined in the beggining of this file
+	// this thread accesses the volatile variable defined in the beggining of this file
 	pthread_t checkInterruption;
 	pthread_create(&checkInterruption, NULL, checkInterrupt, NULL);
+
+	// reseting on every call of slowPrint
 	shouldSkip = false;
 
 	while(*str) {
+		// if the user presss a key we fast-forward the printing process
 		if(shouldSkip) {
 			printf("%s", str);
 			break;
 		}
 		putchar(*str++);
-
-
 		fflush(stdout);
+		// sleep a little longer on dots, this gives more dinamicity to the output
 		if(*(str - 1) == '.') {
 			usleep(300000);
 		}
+		// between each character output sleep for 20~35 miliseconds
 		usleep((randomFloat * 15 + 20) * 1000);
 	}
 	shouldSkip = false;
@@ -93,7 +98,7 @@ void slowPrint(char *str) {
 }
 
 void *checkInterrupt(void *arg) {
-	// prints the rest of the narration line if a key is pressed
+	// activates the shouldSkip flag when a key is pressed
 	while(!shouldSkip) {
 		if(getchar()) {
 			shouldSkip = true;
