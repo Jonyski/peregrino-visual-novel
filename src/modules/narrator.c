@@ -10,7 +10,7 @@
 
 volatile int shouldSkip = false; // for allowing the slow printing to be fast-forwarded
 
-struct Narrator createNarrator() {
+struct Narrator createNarrator(char *textFilePath) {
 	struct Narrator narrator;
 
 	#ifdef _WIN32
