@@ -13,14 +13,8 @@ volatile int shouldSkip = false; // for allowing the slow printing to be fast-fo
 struct Narrator createNarrator(char *textFilePath) {
 	struct Narrator narrator;
 
-	#ifdef _WIN32
-		char *textPath = ".\\texts\\day1-script.txt";
-	#else
-		char *textPath = "./texts/day1-script.txt";
-	#endif
-
-	int numOfLines = getNumberOfLines(textPath);
-	FILE *scriptFile = fopen(textPath, "r");
+	int numOfLines = getNumberOfLines(textFilePath);
+	FILE *scriptFile = fopen(textFilePath, "r");
 
 	if(scriptFile == NULL) {
 		exit(1); // failed to access script file
