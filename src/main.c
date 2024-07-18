@@ -4,6 +4,9 @@
 #include <locale.h>
 #include <time.h>
 #include "narrator.h"
+#include "player.h"
+
+//struct Player player = createPlayer();
 
 int main(int argc, char const *argv[]) {
 	setlocale(LC_ALL, "");

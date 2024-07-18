@@ -46,6 +46,7 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 	if(shouldClear) {
 		system("clear");
 	}
+	//narrator->script[narrator->nextLine] = preProcessLine(narrator->script[narrator->nextLine]);
 	slowPrint(narrator->script[narrator->nextLine]);
 	if(!shouldSkip) {
 		pause;
