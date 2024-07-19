@@ -5,10 +5,14 @@
 #include <termios.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <stdbool.h>
 #include "narrator.h"
 #include "utils.h"
+#include "userinput.h"
+#include "gamestate.h"
 
-volatile int shouldSkip = false; // for allowing the slow printing to be fast-forwarded
+volatile bool shouldSkip = false; // for allowing the slow printing to be fast-forwarded
+volatile bool ignoreSkip = false; // so that skip tentatives are ignored during input reading
 
 struct Narrator createNarrator(char *textFilePath) {
 	struct Narrator narrator;
@@ -46,11 +50,40 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 	if(shouldClear) {
 		system("clear");
 	}
-	//narrator->script[narrator->nextLine] = preProcessLine(narrator->script[narrator->nextLine]);
+
+	// saving a copy of the raw narration line
+	char nextLine[strlen(narrator->script[narrator->nextLine] + 1)];
+	strcpy(nextLine, narrator->script[narrator->nextLine]);
+
+	bool isInput = false; // at first we assume the line doesn't ask for user input
+	int inputsRead = 0; // how many inputs have already been read
+	if(strncmp(nextLine, "<input>", 7) == 0) isInput = true;
+	
+	// altering the original line to clean it up and format it
+	// narrator->script[narrator->nextLine] = processLine(narrator->script[narrator->nextLine]);
+
 	slowPrint(narrator->script[narrator->nextLine]);
+
+	// geting and processing user input
+	if(isInput) {
+		inputsRead++;
+		InputERR currError = NO_ERR;
+		ignoreSkip = true;
+		printf("INPUT: ");
+		// ask for it until it is formated correctly
+		do {
+			char *userInput;
+			strcpy(userInput, getUserInput(currError));
+			currError = processFreeFormInput(userInput, inputsRead);
+		} while(currError != NO_ERR);
+		ignoreSkip = false;
+	}
+
+	// pauses if the slowPrint wasn't skiped
 	if(!shouldSkip) {
 		pause;
 	}
+
 	if(narrator->nextLine < narrator->amountOfLines){
 		narrator->nextLine++;
 	}
@@ -92,10 +125,41 @@ void slowPrint(char *str) {
 	tcsetattr(STDIN_FILENO, TCSANOW, &old_conf);
 }
 
+char *getUserInput(InputERR err) {
+	switch(err) {
+		case SHOULD_BE_STR:
+			printf("\npor favor, escreva apenas caracteres alfanuméricos: ");
+			break;
+		case SHOULD_BE_INT:
+			printf("\nnão não não, isso não me parece um número, mim dê um número: ");
+			break;
+		case TOO_LONG:
+			printf("\npassou de duas linhas eu nem leio, me dê algo mais curto: ");
+			break;
+		case TOO_SHORT:
+			printf("\nisso é muito curto (foi o que ela disse), tente de novo: ");
+			break;
+		case  NULL_INPUT:
+			printf("\nei, seu input não pode ser vazio: \n");
+			break;
+	}
+	char temp[64];
+	scanf(" %s ", temp);
+	return temp;
+}
+
+InputERR processFreeFormInput(char *input, int inputNum) {
+	if(currContext.currActivity == CLASS) {
+		if(currContext.currDay == 1) {
+			return processDay1ClassInput(input, inputNum);
+		}
+	}
+}
+
 void *checkInterrupt(void *arg) {
 	// activates the shouldSkip flag when a key is pressed
 	while(!shouldSkip) {
-		if(getchar()) {
+		if(getchar() && !ignoreSkip) {
 			shouldSkip = true;
 		}
 	}
