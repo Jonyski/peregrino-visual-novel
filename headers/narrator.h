@@ -13,7 +13,7 @@ struct Narrator {
 
 struct Narrator createNarrator(char *filePath); // instanciates a narrator
 void narrate(struct Narrator *, bool);  // narrates 1 line (the one indexed be narrator->nextLine)
-char *getUserInput(InputERR);      // reads the user input and comunicates any error
+void getUserInput(char *, InputERR);      // reads the user input and comunicates any error
 InputERR processFreeFormInput(char *, int); // does with the input what is adequate according to the context
 char *preProcessLine();                 // 
 void slowPrint(char *str);              // prints strings in a clean way

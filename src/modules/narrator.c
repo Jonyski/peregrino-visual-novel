@@ -26,13 +26,17 @@ struct Narrator createNarrator(char *textFilePath) {
 		exit(1); // failed to access script file
 	}
 
-	char *script[numOfLines];
+	char **script = malloc(numOfLines * sizeof(char*));
+	if (script == NULL) {
+		exit(1);
+	}
+	
 	char buffer[2048];
 	int currLine = 0;
 	while(fgets(buffer, sizeof(buffer), scriptFile) && currLine < numOfLines) {
-		script[currLine] = malloc(strlen(buffer));
+		script[currLine] = malloc(strlen(buffer) + 1);
 		if(script[currLine] == NULL) {
-			exit(1); // failed to allocate the script
+			exit(1);
 		}
 
 		strcpy(script[currLine], buffer);
@@ -74,8 +78,8 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 		printf("INPUT: ");
 		// ask for it until it is formated correctly
 		do {
-			char *userInput;
-			strcpy(userInput, getUserInput(currError));
+			char userInput[128];
+			getUserInput(userInput, currError);
 			currError = processFreeFormInput(userInput, inputsRead);
 		} while(currError != NO_ERR);
 		ignoreSkip = false;
@@ -89,6 +93,8 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 	if(narrator->nextLine < narrator->amountOfLines){
 		narrator->nextLine++;
 	}
+
+	free(narrator->script[narrator->nextLine - 1]);
 }
 
 void slowPrint(char *str) {
@@ -127,7 +133,7 @@ void slowPrint(char *str) {
 	tcsetattr(STDIN_FILENO, TCSANOW, &old_conf);
 }
 
-char *getUserInput(InputERR err) {
+void getUserInput(char *userInput, InputERR err) {
 	switch(err) {
 		case SHOULD_BE_STR:
 			printf("\npor favor, escreva apenas caracteres alfanuméricos: ");
@@ -145,9 +151,7 @@ char *getUserInput(InputERR err) {
 			printf("\nei, seu input não pode ser vazio: \n");
 			break;
 	}
-	char temp[64];
-	scanf(" %s ", temp);
-	return temp;
+	scanf(" %s ", userInput);
 }
 
 InputERR processFreeFormInput(char *input, int inputNum) {
@@ -179,35 +183,35 @@ int getNumberOfLines(char *filePath) {
 }
 
 void printCenteredText(char *text) {
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    int width = w.ws_col;
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	int width = w.ws_col;
 
-    int textLength = strlen(text);
-    int padding = (width - textLength) / 2;
+	int textLength = strlen(text);
+	int padding = (width - textLength) / 2;
 
-    // Print leading spaces
-    for (int i = 0; i < padding; i++) {
-        printf(" ");
-    }
+	// Print leading spaces
+	for (int i = 0; i < padding; i++) {
+		printf(" ");
+	}
 
-    // Print the actual text
-    printf("%s\n", text);
+	// Print the actual text
+	printf("%s\n", text);
 }
 
 void slowCenteredText(char *text) {
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    int width = w.ws_col;
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	int width = w.ws_col;
 
-    int textLength = strlen(text);
-    int padding = (width - textLength) / 2;
+	int textLength = strlen(text);
+	int padding = (width - textLength) / 2;
 
-    // Print leading spaces
-    for (int i = 0; i < padding; i++) {
-        printf(" ");
-    }
+	// Print leading spaces
+	for (int i = 0; i < padding; i++) {
+		printf(" ");
+	}
 
-    // Print the actual text
-    slowPrint(text);
+	// Print the actual text
+	slowPrint(text);
 }
