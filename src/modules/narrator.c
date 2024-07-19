@@ -62,7 +62,6 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 	strcpy(nextLine, narrator->script[narrator->nextLine]);
 
 	bool isInput = false; // at first we assume the line doesn't ask for user input
-	int inputsRead = 0; // how many inputs have already been read
 	if(strncmp(nextLine, "<input>", 7) == 0) isInput = true;
 	
 	// altering the original line to clean it up and format it
@@ -72,7 +71,7 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 
 	// geting and processing user input
 	if(isInput) {
-		inputsRead++;
+		currContext.inputsRead++;
 		InputERR currError = NO_ERR;
 		ignoreSkip = true;
 		printf("> ");
@@ -80,7 +79,7 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 		do {
 			char userInput[USR_INPUT_MAX_SIZE];
 			getUserInput(userInput, currError);
-			currError = processFreeFormInput(userInput, inputsRead);
+			currError = processFreeFormInput(userInput, currContext.inputsRead);
 		} while(currError != NO_ERR);
 		ignoreSkip = false;
 	}
@@ -128,8 +127,13 @@ void slowPrint(char *str) {
 		// between each character output sleep for 20~35 miliseconds
 		usleep((randomFloat * 15 + 20) * 1000);
 	}
-	shouldSkip = false;
-	pthread_join(checkInterruption, NULL);
+
+	if(shouldSkip == false) {
+		pthread_cancel(checkInterruption);
+	} else{
+		shouldSkip = false;
+		pthread_join(checkInterruption, NULL);
+	}
 	tcsetattr(STDIN_FILENO, TCSANOW, &old_conf);
 }
 

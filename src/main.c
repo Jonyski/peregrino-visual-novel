@@ -21,6 +21,7 @@ int main(int argc, char const *argv[]) {
 	#endif
 	currContext.currDay = 1;
 	currContext.numOfInputs = 2;
+	currContext.inputsRead = 0;
 	currContext.currActivity = CLASS;
 
 	struct Narrator narrator = createNarrator(currContext.textPath);
