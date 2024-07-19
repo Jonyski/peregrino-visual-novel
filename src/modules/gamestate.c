@@ -3,12 +3,6 @@
 #include "gamestate.h"
 #include "npc.h"
 
-struct GameState {
-	int isaPoints;
-	struct NPC **bossesDefeated;
-	bool panelasUnlocked;
-};
-
 struct GameState *createGameState() {
 	struct GameState *newState = malloc(sizeof(struct GameState));
 	if(newState == NULL) {

@@ -1,14 +1,6 @@
 #include <stdlib.h>
 #include "item.h"
 
-struct Item {
-	char *name;
-	char *effectDescription;
-	int amount;
-	void (*use)(struct Item *);
-	void (*applyEffect)(struct Item *);
-};
-
 struct Item *createItem(char *name, char *effectDescription, int amount, void (*effect)(struct Item *)) {
 	struct Item *newItem = malloc(sizeof(struct Item));
 	if(newItem == NULL) {
