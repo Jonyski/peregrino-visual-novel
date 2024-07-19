@@ -1,8 +1,8 @@
 #ifndef PLACES_H
 #define PLACES_H
 
-int printamapa();
-void opcoes();
+int printMap();
+void showNavigationOptions();
 void biblioteca();
 void queijo();
 void auditorios();

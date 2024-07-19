@@ -5,9 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 
-//BASIC FUNCTIONS TO PRINT THE MAP AND SHOW THE OPTIONS OF ALL PLACES
-
-int printamapa(){
+int printMap(){
 
 	FILE *file;
 	char mapa[1600];
@@ -28,7 +26,7 @@ int printamapa(){
 	return 1;
 }
 
-void opcoes(){
+void showNavigationOptions(){
 
 	char choose[1];
 
@@ -94,8 +92,8 @@ void switchbiblio(char *choose){
 			break;
 		case 'C':
 			system("clear");
-			printamapa();
-			opcoes();
+			printMap();
+			showNavigationOptions();
 			break;
 		default:
 			system("clear");
@@ -147,8 +145,8 @@ void switchtitanic(char *choose){
 			break;
 		case 'E':
 			system("clear");
-			printamapa();
-			opcoes();
+			printMap();
+			showNavigationOptions();
 			break;
 		default:
 			system("clear");
@@ -173,8 +171,8 @@ void switchqueijo(char *choose){
 			break;
 		case 'B':
 			system("clear");
-			printamapa();
-			opcoes();
+			printMap();
+			showNavigationOptions();
 			break;
 		default:
 			system("clear");
@@ -229,8 +227,8 @@ void switchauditorios(char *choose){
 		
 		case 'E':
 			system("clear");
-			printamapa();
-			opcoes();
+			printMap();
+			showNavigationOptions();
 			break;
 
 		default:
@@ -261,8 +259,8 @@ void switchgrama(char *choose){
 
 		case 'B':
 			system("clear");
-			printamapa();
-			opcoes();
+			printMap();
+			showNavigationOptions();
 
 		default:
 			system("clear");

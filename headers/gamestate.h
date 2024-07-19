@@ -4,9 +4,6 @@
 #include <stdbool.h>
 #include "player.h"
 
-// global variables
-extern struct Player player; // the player object
-extern struct Context currContext; // path to the current file being read, serves as a context identifier
 
 // enum representing what the player is doing in a determined context
 typedef enum {
@@ -25,6 +22,10 @@ struct Context {
 	short int currDay;     // the number of the day being played 
 	Activity currActivity; // true if the player is in a boss fight
 };
+
+// global variables
+extern struct Player player; // the player object
+extern struct Context currContext; // path to the current file being read, serves as a context identifier
 
 // game-long important values for a save-system
 struct GameState {

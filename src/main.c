@@ -6,6 +6,9 @@
 #include "player.h"
 #include "gamestate.h"
 
+struct Player player;
+struct Context currContext;
+
 int main(int argc, char const *argv[]) {
 	setlocale(LC_ALL, "");
 	srand(time(NULL));

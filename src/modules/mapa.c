@@ -3,14 +3,9 @@
 #include "places.h"
 #include "narrator.h"
 
-int main(){
-
-	char choose[1];
-	printamapa();
+int mapa(){
+	char choice[1];
+	printMap();
 	slowPrint("Você está no portão 3 da EACH.\n");
-	opcoes();
-
-	
-
-
+	showNavigationOptions();
 }
