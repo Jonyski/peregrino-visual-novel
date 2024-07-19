@@ -75,10 +75,10 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 		inputsRead++;
 		InputERR currError = NO_ERR;
 		ignoreSkip = true;
-		printf("INPUT: ");
+		printf("> ");
 		// ask for it until it is formated correctly
 		do {
-			char userInput[128];
+			char userInput[USR_INPUT_MAX_SIZE];
 			getUserInput(userInput, currError);
 			currError = processFreeFormInput(userInput, inputsRead);
 		} while(currError != NO_ERR);
@@ -86,15 +86,15 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 	}
 
 	// pauses if the slowPrint wasn't skiped
-	if(!shouldSkip) {
+	if(!shouldSkip && !isInput) {
 		pause;
 	}
 
+	free(narrator->script[narrator->nextLine]);
 	if(narrator->nextLine < narrator->amountOfLines){
 		narrator->nextLine++;
 	}
 
-	free(narrator->script[narrator->nextLine - 1]);
 }
 
 void slowPrint(char *str) {
@@ -136,22 +136,25 @@ void slowPrint(char *str) {
 void getUserInput(char *userInput, InputERR err) {
 	switch(err) {
 		case SHOULD_BE_STR:
-			printf("\npor favor, escreva apenas caracteres alfanuméricos: ");
+			printf("\npor favor, escreva apenas caracteres alfanuméricos:\n> ");
 			break;
 		case SHOULD_BE_INT:
-			printf("\nnão não não, isso não me parece um número, mim dê um número: ");
+			printf("\nnão não não, isso não me parece um número, mim dê um número:\n> ");
 			break;
 		case TOO_LONG:
-			printf("\npassou de duas linhas eu nem leio, me dê algo mais curto: ");
+			printf("\npassou de duas linhas eu nem leio, me dê algo mais curto:\n> ");
 			break;
 		case TOO_SHORT:
-			printf("\nisso é muito curto (foi o que ela disse), tente de novo: ");
+			printf("\nisso é muito curto (foi o que ela disse), tente de novo:\n> ");
 			break;
 		case  NULL_INPUT:
-			printf("\nei, seu input não pode ser vazio: \n");
+			printf("\nei, seu input não pode ser vazio:\n> ");
+			break;
+		case WRONG_ANSWER:
+			printf("\nnão, isso está errado, tente de novo:\n> ");
 			break;
 	}
-	scanf(" %s ", userInput);
+	cleanScan(userInput);
 }
 
 InputERR processFreeFormInput(char *input, int inputNum) {
@@ -165,7 +168,7 @@ InputERR processFreeFormInput(char *input, int inputNum) {
 void *checkInterrupt(void *arg) {
 	// activates the shouldSkip flag when a key is pressed
 	while(!shouldSkip) {
-		if(getchar() && !ignoreSkip) {
+		if(getchar()) {
 			shouldSkip = true;
 		}
 	}
@@ -182,7 +185,7 @@ int getNumberOfLines(char *filePath) {
 	return numOfLines;
 }
 
-void printCenteredText(char *text) {
+void printCentered(char *text) {
 	struct winsize w;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	int width = w.ws_col;
@@ -199,7 +202,7 @@ void printCenteredText(char *text) {
 	printf("%s\n", text);
 }
 
-void slowCenteredText(char *text) {
+void slowPrintCentered(char *text) {
 	struct winsize w;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	int width = w.ws_col;

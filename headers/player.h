@@ -5,7 +5,7 @@
 
 #define INVENTORY_SIZE 10
 #define INITIAL_HP 20
-#define NAME_SIZE_LIMIT 20
+#define NAME_SIZE_LIMIT 32
 
 // the simple struct representing the player
 // there should probably be one instance of this struct, but idk

@@ -18,8 +18,8 @@ InputERR processFreeFormInput(char *, int); // does with the input what is adequ
 char *preProcessLine();                 // 
 void slowPrint(char *str);              // prints strings in a clean way
 void *checkInterrupt(void *arg);        // checks for interruptions that will fast-forward slowPrint()
-void printCenteredText(char *text); //print text in a centralized way
-void slowCenteredText(char *text); //slowly, print text in a centralized way
+void printCentered(char *text); //print text in a centralized way
+void slowPrintCentered(char *text); //slowly, print text in a centralized way
 int getNumberOfLines(char *);           // finds the number of lines in a file
 
 #endif

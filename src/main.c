@@ -20,10 +20,11 @@ int main(int argc, char const *argv[]) {
 		strcpy(currContext.textPath, "./texts/day1-script.txt");
 	#endif
 	currContext.currDay = 1;
+	currContext.numOfInputs = 2;
 	currContext.currActivity = CLASS;
 
 	struct Narrator narrator = createNarrator(currContext.textPath);
 	for(int i = 0; i < narrator.amountOfLines - 1; i++) {
-		narrate(&narrator, true);
+		narrate(&narrator, false);
 	}
 }

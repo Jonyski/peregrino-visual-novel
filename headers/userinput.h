@@ -1,6 +1,8 @@
 #ifndef USERINPUT_H
 #define USERINPUT_H
 
+#define USR_INPUT_MAX_SIZE 128
+
 // useful when prompting the user for a new input
 typedef enum {
 	SHOULD_BE_STR,
