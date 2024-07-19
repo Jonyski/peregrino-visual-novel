@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 #include "narrator.h"
 #include "utils.h"
 #include "userinput.h"
@@ -174,4 +176,38 @@ int getNumberOfLines(char *filePath) {
 	}
 	fclose(file);
 	return numOfLines;
+}
+
+void printCenteredText(char *text) {
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    int width = w.ws_col;
+
+    int textLength = strlen(text);
+    int padding = (width - textLength) / 2;
+
+    // Print leading spaces
+    for (int i = 0; i < padding; i++) {
+        printf(" ");
+    }
+
+    // Print the actual text
+    printf("%s\n", text);
+}
+
+void slowCenteredText(char *text) {
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    int width = w.ws_col;
+
+    int textLength = strlen(text);
+    int padding = (width - textLength) / 2;
+
+    // Print leading spaces
+    for (int i = 0; i < padding; i++) {
+        printf(" ");
+    }
+
+    // Print the actual text
+    slowPrint(text);
 }
