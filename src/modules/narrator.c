@@ -5,10 +5,16 @@
 #include <termios.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <stdbool.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 #include "narrator.h"
 #include "utils.h"
+#include "userinput.h"
+#include "gamestate.h"
 
-volatile int shouldSkip = false; // for allowing the slow printing to be fast-forwarded
+volatile bool shouldSkip = false; // for allowing the slow printing to be fast-forwarded
+volatile bool ignoreSkip = false; // so that skip tentatives are ignored during input reading
 
 struct Narrator createNarrator(char *textFilePath) {
 	struct Narrator narrator;
@@ -20,13 +26,17 @@ struct Narrator createNarrator(char *textFilePath) {
 		exit(1); // failed to access script file
 	}
 
-	char *script[numOfLines];
+	char **script = malloc(numOfLines * sizeof(char*));
+	if (script == NULL) {
+		exit(1);
+	}
+	
 	char buffer[2048];
 	int currLine = 0;
 	while(fgets(buffer, sizeof(buffer), scriptFile) && currLine < numOfLines) {
-		script[currLine] = malloc(strlen(buffer));
+		script[currLine] = malloc(strlen(buffer) + 1);
 		if(script[currLine] == NULL) {
-			exit(1); // failed to allocate the script
+			exit(1);
 		}
 
 		strcpy(script[currLine], buffer);
@@ -46,13 +56,45 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 	if(shouldClear) {
 		system("clear");
 	}
+
+	// saving a copy of the raw narration line
+	char nextLine[strlen(narrator->script[narrator->nextLine] + 1)];
+	strcpy(nextLine, narrator->script[narrator->nextLine]);
+
+	bool isInput = false; // at first we assume the line doesn't ask for user input
+	int inputsRead = 0; // how many inputs have already been read
+	if(strncmp(nextLine, "<input>", 7) == 0) isInput = true;
+	
+	// altering the original line to clean it up and format it
+	// narrator->script[narrator->nextLine] = processLine(narrator->script[narrator->nextLine]);
+
 	slowPrint(narrator->script[narrator->nextLine]);
-	if(!shouldSkip) {
+
+	// geting and processing user input
+	if(isInput) {
+		inputsRead++;
+		InputERR currError = NO_ERR;
+		ignoreSkip = true;
+		printf("> ");
+		// ask for it until it is formated correctly
+		do {
+			char userInput[USR_INPUT_MAX_SIZE];
+			getUserInput(userInput, currError);
+			currError = processFreeFormInput(userInput, inputsRead);
+		} while(currError != NO_ERR);
+		ignoreSkip = false;
+	}
+
+	// pauses if the slowPrint wasn't skiped
+	if(!shouldSkip && !isInput) {
 		pause;
 	}
+
+	free(narrator->script[narrator->nextLine]);
 	if(narrator->nextLine < narrator->amountOfLines){
 		narrator->nextLine++;
 	}
+
 }
 
 void slowPrint(char *str) {
@@ -91,6 +133,38 @@ void slowPrint(char *str) {
 	tcsetattr(STDIN_FILENO, TCSANOW, &old_conf);
 }
 
+void getUserInput(char *userInput, InputERR err) {
+	switch(err) {
+		case SHOULD_BE_STR:
+			printf("\npor favor, escreva apenas caracteres alfanuméricos:\n> ");
+			break;
+		case SHOULD_BE_INT:
+			printf("\nnão não não, isso não me parece um número, mim dê um número:\n> ");
+			break;
+		case TOO_LONG:
+			printf("\npassou de duas linhas eu nem leio, me dê algo mais curto:\n> ");
+			break;
+		case TOO_SHORT:
+			printf("\nisso é muito curto (foi o que ela disse), tente de novo:\n> ");
+			break;
+		case  NULL_INPUT:
+			printf("\nei, seu input não pode ser vazio:\n> ");
+			break;
+		case WRONG_ANSWER:
+			printf("\nnão, isso está errado, tente de novo:\n> ");
+			break;
+	}
+	cleanScan(userInput);
+}
+
+InputERR processFreeFormInput(char *input, int inputNum) {
+	if(currContext.currActivity == CLASS) {
+		if(currContext.currDay == 1) {
+			return processDay1ClassInput(input, inputNum);
+		}
+	}
+}
+
 void *checkInterrupt(void *arg) {
 	// activates the shouldSkip flag when a key is pressed
 	while(!shouldSkip) {
@@ -109,4 +183,38 @@ int getNumberOfLines(char *filePath) {
 	}
 	fclose(file);
 	return numOfLines;
+}
+
+void printCentered(char *text) {
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	int width = w.ws_col;
+
+	int textLength = strlen(text);
+	int padding = (width - textLength) / 2;
+
+	// Print leading spaces
+	for (int i = 0; i < padding; i++) {
+		printf(" ");
+	}
+
+	// Print the actual text
+	printf("%s\n", text);
+}
+
+void slowPrintCentered(char *text) {
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	int width = w.ws_col;
+
+	int textLength = strlen(text);
+	int padding = (width - textLength) / 2;
+
+	// Print leading spaces
+	for (int i = 0; i < padding; i++) {
+		printf(" ");
+	}
+
+	// Print the actual text
+	slowPrint(text);
 }
