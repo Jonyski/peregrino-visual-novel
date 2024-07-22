@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "commands.h"
 #include "utils.h"
+#include "places.h"
 
 void readCommand() {
 	int result = 1;
@@ -26,14 +27,20 @@ int processCommand(char *cmd) {
 	} else if(!strcmp(cmd, "options") || !strcmp(cmd, "o")) {
 		options();
 		return 1;
-	} else if(!strcmp(cmd, "save") || !strcmp(cmd, "s")) {
-		save();
-		return 1;
 	} else if(!strcmp(cmd, "inventory") || !strcmp(cmd, "i")) {
 		exibitInventory();
 		return 1;
 	} else if(!strcmp(cmd, "jupiter") || !strcmp(cmd, "j")) {
 		jupiterWeb();
+		return 1;
+	} else if(!strcmp(cmd, "map") || !strcmp(cmd, "m")) {
+		map();
+		return 1;
+	} else if(!strcmp(cmd, "clear") || !strcmp(cmd, "c")) {
+		clear();
+		return 1;
+	} else if(!strcmp(cmd, "save") || !strcmp(cmd, "s")) {
+		save();
 		return 1;
 	} else if(!strcmp(cmd, "quit")) {
 		quit();
@@ -50,8 +57,10 @@ void help() {
 	puts("options (o): mude as opções do jogo");
 	puts("inventory (i): veja seu inventário");
 	puts("jupiter (j): veja sua grade horária no JupiterWeb");
+	puts("map (m): veja o mapa da EACH");
+	puts("clear (c): limpe a tela");
 	puts("save (s): salve o jogo");
-	puts("quit (q): saia do jogo (;-;)");
+	puts("quit: saia do jogo (;-;)");
 }
 
 void options() {
@@ -65,7 +74,7 @@ void exibitInventory() {
 }
 
 void jupiterWeb() {
-	system("clear");
+	clear();
 	puts("https://uspdigital.usp.br/jupiterweb/gradeHoraria");
 
 	FILE *file;
@@ -88,6 +97,15 @@ void jupiterWeb() {
 	printf("\n\n");
 	
 	fclose(file);
+}
+
+void map() {
+	clear();
+	printMap();
+}
+
+void clear() {
+	system("clear");
 }
 
 void save() {

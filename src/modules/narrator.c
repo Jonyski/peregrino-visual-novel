@@ -139,9 +139,36 @@ void *checkInterrupt(void *arg) {
 }
 
 char *processLine(char *line) {
-	char *inputMarker = "<input>";
+	char *outputLine; // the line that will recieve all processing changes
+	char *temp = line;       // variable to hold lines that will be free'd (since strReplace returns a new manually allocated str)
+	
+	// tags to be substituted
+	char *inputTag = "<input>";
+	char *playerNameTag = "<P-name>";
+	char *playerSpeechTag = "<P>";
+	char *playerThoughtTag = "<P-T>";
+
+	// strings to replace the tags with
+	char playerSpeech[42];
+	strcpy(playerSpeech, player.name);
+	strcat(playerSpeech, ": ");
+	char playerThought[42];
+	strcpy(playerThought, player.name);
+	strcat(playerThought, ": ");
+
 	// removing "<input>" from the beggining of input lines
-	return strReplace(line, "<input>", NULL);
+	outputLine = strReplace(temp, inputTag, NULL);
+	temp = outputLine;
+	outputLine = strReplace(temp, playerNameTag, player.name);
+	free(temp);
+	temp = outputLine;
+	outputLine = strReplace(temp, playerSpeechTag, playerSpeech);
+	free(temp);
+	temp = outputLine;
+	outputLine = strReplace(temp, playerThoughtTag, playerThought);
+	free(temp);
+
+	return outputLine;
 }
 
 int getNumberOfLines(char *filePath) {

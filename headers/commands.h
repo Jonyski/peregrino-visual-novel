@@ -9,9 +9,11 @@ int processCommand(char *cmd); // run the corresponding function to the command 
 
 void help();            // tells the user what are the available commands and what they do
 void options();         // allows the user to change the options
-void save();            // saves the game
 void exibitInventory(); // shows the user their inventory
 void jupiterWeb();      // shows the user the course's cronogram
+void map();             // prints the EACH map
+void clear();           // clears the screen
+void save();            // saves the game
 void quit();            // quits the game (auto-saves?)
 
 #endif
