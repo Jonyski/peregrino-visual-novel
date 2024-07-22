@@ -5,7 +5,7 @@
 #include "narrator.h"
 #include "player.h"
 #include "gamestate.h"
-#include "places.h"
+#include "navigation.h"
 
 struct Player player;
 struct Context currContext;
@@ -29,6 +29,5 @@ int main(int argc, char const *argv[]) {
 	for(int i = 0; i < narrator.amountOfLines; i++) {
 		narrate(&narrator, true);
 	}
-	printMap();
-	showNavigationOptions();
+	navigateMap();
 }

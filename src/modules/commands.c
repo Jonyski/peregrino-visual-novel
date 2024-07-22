@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "commands.h"
 #include "utils.h"
-#include "places.h"
+#include "navigation.h"
 
 void readCommand() {
 	int result = 1;
