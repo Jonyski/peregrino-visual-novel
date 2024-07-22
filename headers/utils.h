@@ -14,5 +14,6 @@
 void trimWhitespace(char *str);
 // reads stdin input avoiding buffer overflows and trimming white space
 int cleanScan(char *dest);
-
+// replaces all occurences of rep in orig with with
+char *strReplace(char *orig, char *rep, char *with);
 #endif

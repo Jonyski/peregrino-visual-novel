@@ -12,6 +12,7 @@
 #include "utils.h"
 #include "userinput.h"
 #include "gamestate.h"
+#include "commands.h"
 
 volatile bool shouldSkip = false; // for allowing the slow printing to be fast-forwarded
 volatile bool ignoreSkip = false; // so that skip tentatives are ignored during input reading
@@ -65,7 +66,8 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 	if(strncmp(nextLine, "<input>", 7) == 0) isInput = true;
 	
 	// altering the original line to clean it up and format it
-	// narrator->script[narrator->nextLine] = processLine(narrator->script[narrator->nextLine]);
+	free(narrator->script[narrator->nextLine]);
+	narrator->script[narrator->nextLine] = processLine(nextLine);
 
 	slowPrint(narrator->script[narrator->nextLine]);
 	if(narrator->nextLine == narrator->amountOfLines - 1) {
@@ -134,6 +136,12 @@ void *checkInterrupt(void *arg) {
 			shouldSkip = true;
 		}
 	}
+}
+
+char *processLine(char *line) {
+	char *inputMarker = "<input>";
+	// removing "<input>" from the beggining of input lines
+	return strReplace(line, "<input>", NULL);
 }
 
 int getNumberOfLines(char *filePath) {
