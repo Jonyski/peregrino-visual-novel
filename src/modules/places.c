@@ -17,7 +17,7 @@ int printMap(){
 	while(fgets(mapa, sizeof(mapa), file) != NULL){
 		printf("%s", mapa);
 	}
-
+	
 	fclose(file);
 	return 1;
 }
