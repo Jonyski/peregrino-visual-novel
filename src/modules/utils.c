@@ -15,7 +15,7 @@ void trimWhitespace(char *str) {
     *(end + 1) = '\0';
 }
 
-void cleanScan(char *dest) {
+int cleanScan(char *dest) {
 	if (fgets(dest, USR_INPUT_MAX_SIZE, stdin) != NULL) {
         size_t len = strlen(dest);
         if (len > 0 && dest[len - 1] == '\n') {
@@ -23,4 +23,5 @@ void cleanScan(char *dest) {
         }
         trimWhitespace(dest);
     }
+    return strlen(dest);
 }

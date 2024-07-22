@@ -13,6 +13,6 @@
 // removes whitespace from te beggining and ending of a str
 void trimWhitespace(char *str);
 // reads stdin input avoiding buffer overflows and trimming white space
-void cleanScan(char *dest);
+int cleanScan(char *dest);
 
 #endif

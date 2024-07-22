@@ -1,6 +1,8 @@
+#include <stdio.h>
 #include <string.h>
 #include "userinput.h"
 #include "gamestate.h"
+#include "utils.h"
 
 void readInput() {
 	currContext.inputsRead++;

@@ -1,11 +1,18 @@
+#include <stdlib.h>
 #include "commands.h"
 #include "utils.h"
 
 void readCommand() {
+	int result = 1;
 	printf("$ ");
 	char command[32];
-	cleanScan(command);
-	processCommand(command);
+	while(result) {
+		cleanScan(command);
+		result = processCommand(command);
+		if(result) {
+			printf("$ ");
+		}
+	}
 }
 
 int processCommand(char *cmd) {
@@ -50,16 +57,15 @@ void help() {
 void options() {
 	// TO-DO: implement this function for real
 	puts("OPÇÕES: ");
-	pause;
 }
 
 void exibitInventory() {
 	// TO-DO: implement this function for real
 	puts("INVENTÁRIO: ");
-	pause;
 }
 
 void jupiterWeb() {
+	system("clear");
 	puts("https://uspdigital.usp.br/jupiterweb/gradeHoraria");
 
 	FILE *file;
@@ -79,9 +85,9 @@ void jupiterWeb() {
 	while(fgets(cronogram, sizeof(cronogram), file) != NULL){
 		printf("%s", cronogram);
 	}
+	printf("\n\n");
 	
 	fclose(file);
-	pause;
 }
 
 void save() {
@@ -89,11 +95,10 @@ void save() {
 	puts("salvando o jogo...");
 	puts("...");
 	puts("JOGO SALVO");
-	pause;
 }
 
 void quit() {
 	// TO-DO: implement this function for real
 	puts("see you next time!");
-	pause;
+	exit(0);
 }
