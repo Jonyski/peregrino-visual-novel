@@ -120,3 +120,24 @@ void quit() {
 	puts("see you next time!");
 	exit(0);
 }
+
+int classifiesAsCommand(char *input) {
+	char *validCommands[15] = {
+		"help", "h",
+		"options", "o",
+		"inventory", "i",
+		"jupiter", "j",
+		"map", "m",
+		"clear", "c",
+		"save", "s",
+		"quit"
+	};
+
+	for(int i = 0; i < 15; i++) {
+		if(!strcmp(input, validCommands[i])) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
