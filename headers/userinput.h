@@ -14,6 +14,10 @@ typedef enum {
 	NO_ERR
 } InputERR;
 
+void readInput();                    // gets the user input and then process it
+void getUserInput(char *, InputERR); // reads the user input and comunicates any error
+InputERR processFreeFormInput(char *, int); // does with the input what is adequate according to the context
+
 // compilation of functions that process each daily classes inputs
 InputERR processDay1ClassInput(char *, int); // day 1 has 2 inputs: player name and Calculus classroom n°
 InputERR processDay2ClassInput(char *, int); //

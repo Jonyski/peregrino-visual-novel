@@ -1,6 +1,41 @@
 #include "commands.h"
 #include "utils.h"
 
+void readCommand() {
+	printf("$ ");
+	char command[32];
+	cleanScan(command);
+	processCommand(command);
+}
+
+int processCommand(char *cmd) {
+	if(strlen(cmd) == 0) {
+		return 0;
+	}
+
+	if(!strcmp(cmd, "help") || !strcmp(cmd, "h")) {
+		help();
+		return 1;
+	} else if(!strcmp(cmd, "options") || !strcmp(cmd, "o")) {
+		options();
+		return 1;
+	} else if(!strcmp(cmd, "save") || !strcmp(cmd, "s")) {
+		save();
+		return 1;
+	} else if(!strcmp(cmd, "inventory") || !strcmp(cmd, "i")) {
+		exibitInventory();
+		return 1;
+	} else if(!strcmp(cmd, "jupiter") || !strcmp(cmd, "j")) {
+		jupiterWeb();
+		return 1;
+	} else if(!strcmp(cmd, "quit")) {
+		quit();
+		return 1;
+	}
+
+	return 0;
+}
+
 void help() {
 	puts("para dar um comando digite o nome dele por extenso ou sua abreviação e então aperte enter:");
 	puts("");

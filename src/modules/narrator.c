@@ -124,52 +124,6 @@ void slowPrint(char *str) {
 	tcsetattr(STDIN_FILENO, TCSANOW, &old_conf);
 }
 
-void readInput() {
-	currContext.inputsRead++;
-	InputERR currError = NO_ERR;
-	ignoreSkip = true;
-	printf("> ");
-	// ask for it until it is formated correctly
-	do {
-		char userInput[USR_INPUT_MAX_SIZE];
-		getUserInput(userInput, currError);
-		currError = processFreeFormInput(userInput, currContext.inputsRead);
-	} while(currError != NO_ERR);
-	ignoreSkip = false;
-}
-
-void getUserInput(char *userInput, InputERR err) {
-	switch(err) {
-		case SHOULD_BE_STR:
-			printf("\npor favor, escreva apenas caracteres alfanuméricos:\n> ");
-			break;
-		case SHOULD_BE_INT:
-			printf("\nnão não não, isso não me parece um número, mim dê um número:\n> ");
-			break;
-		case TOO_LONG:
-			printf("\npassou de duas linhas eu nem leio, me dê algo mais curto:\n> ");
-			break;
-		case TOO_SHORT:
-			printf("\nisso é muito curto (foi o que ela disse), tente de novo:\n> ");
-			break;
-		case  NULL_INPUT:
-			printf("\nei, seu input não pode ser vazio:\n> ");
-			break;
-		case WRONG_ANSWER:
-			printf("\nnão, isso está errado, tente de novo:\n> ");
-			break;
-	}
-	cleanScan(userInput);
-}
-
-InputERR processFreeFormInput(char *input, int inputNum) {
-	if(currContext.currActivity == CLASS) {
-		if(currContext.currDay == 1) {
-			return processDay1ClassInput(input, inputNum);
-		}
-	}
-}
-
 void *checkInterrupt(void *arg) {
 	// activates the shouldSkip flag when a key is pressed
 	while(!shouldSkip) {
@@ -177,41 +131,6 @@ void *checkInterrupt(void *arg) {
 			shouldSkip = true;
 		}
 	}
-}
-
-void readCommand() {
-	printf("$ ");
-	char command[32];
-	cleanScan(command);
-	processCommand(command);
-}
-
-int processCommand(char *cmd) {
-	if(strlen(cmd) == 0) {
-		return 0;
-	}
-
-	if(!strcmp(cmd, "help") || !strcmp(cmd, "h")) {
-		help();
-		return 1;
-	} else if(!strcmp(cmd, "options") || !strcmp(cmd, "o")) {
-		options();
-		return 1;
-	} else if(!strcmp(cmd, "save") || !strcmp(cmd, "s")) {
-		save();
-		return 1;
-	} else if(!strcmp(cmd, "inventory") || !strcmp(cmd, "i")) {
-		exibitInventory();
-		return 1;
-	} else if(!strcmp(cmd, "jupiter") || !strcmp(cmd, "j")) {
-		jupiterWeb();
-		return 1;
-	} else if(!strcmp(cmd, "quit")) {
-		quit();
-		return 1;
-	}
-
-	return 0;
 }
 
 int getNumberOfLines(char *filePath) {
