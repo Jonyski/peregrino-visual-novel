@@ -25,7 +25,7 @@ int main(int argc, char const *argv[]) {
 	currContext.currActivity = CLASS;
 
 	struct Narrator narrator = createNarrator(currContext.textPath);
-	for(int i = 0; i < narrator.amountOfLines - 1; i++) {
+	for(int i = 0; i < narrator.amountOfLines; i++) {
 		narrate(&narrator, true);
 	}
 }

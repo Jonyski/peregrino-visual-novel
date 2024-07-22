@@ -68,6 +68,9 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 	// narrator->script[narrator->nextLine] = processLine(narrator->script[narrator->nextLine]);
 
 	slowPrint(narrator->script[narrator->nextLine]);
+	if(narrator->nextLine == narrator->amountOfLines - 1) {
+		printf("\n"); // so that the last line of the script don't make thing weird
+	}
 
 	if(isInput) {
 		// geting and processing user input
@@ -135,9 +138,9 @@ void *checkInterrupt(void *arg) {
 
 int getNumberOfLines(char *filePath) {
 	FILE *file = fopen(filePath, "r");
-	char buffer[256];
+	char buffer[1024];
 	int numOfLines = 0;
-	while(fgets(buffer, 256, file)) {
+	while(fgets(buffer, 1024, file)) {
 		numOfLines++;
 	}
 	fclose(file);
