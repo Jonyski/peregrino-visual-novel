@@ -61,7 +61,7 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 	char nextLine[strlen(narrator->script[narrator->nextLine] + 1)];
 	strcpy(nextLine, narrator->script[narrator->nextLine]);
 
-	bool isInput = false; // at first we assume the line doesn't ask for user input
+	bool isInput = false; // signals if the current line is an input one
 	if(strncmp(nextLine, "<input>", 7) == 0) isInput = true;
 	
 	// altering the original line to clean it up and format it
@@ -69,31 +69,18 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 
 	slowPrint(narrator->script[narrator->nextLine]);
 
-	// geting and processing user input
 	if(isInput) {
-		currContext.inputsRead++;
-		InputERR currError = NO_ERR;
-		ignoreSkip = true;
-		printf("> ");
-		// ask for it until it is formated correctly
-		do {
-			char userInput[USR_INPUT_MAX_SIZE];
-			getUserInput(userInput, currError);
-			currError = processFreeFormInput(userInput, currContext.inputsRead);
-		} while(currError != NO_ERR);
-		ignoreSkip = false;
-	}
-
-	// pauses if the slowPrint wasn't skiped
-	if(!shouldSkip && !isInput) {
-		pause;
+		// geting and processing user input
+		readInput();
+	} else {
+		// getting and processing user command
+		readCommand();
 	}
 
 	free(narrator->script[narrator->nextLine]);
 	if(narrator->nextLine < narrator->amountOfLines){
 		narrator->nextLine++;
 	}
-
 }
 
 void slowPrint(char *str) {
@@ -137,6 +124,20 @@ void slowPrint(char *str) {
 	tcsetattr(STDIN_FILENO, TCSANOW, &old_conf);
 }
 
+void readInput() {
+	currContext.inputsRead++;
+	InputERR currError = NO_ERR;
+	ignoreSkip = true;
+	printf("> ");
+	// ask for it until it is formated correctly
+	do {
+		char userInput[USR_INPUT_MAX_SIZE];
+		getUserInput(userInput, currError);
+		currError = processFreeFormInput(userInput, currContext.inputsRead);
+	} while(currError != NO_ERR);
+	ignoreSkip = false;
+}
+
 void getUserInput(char *userInput, InputERR err) {
 	switch(err) {
 		case SHOULD_BE_STR:
@@ -176,6 +177,41 @@ void *checkInterrupt(void *arg) {
 			shouldSkip = true;
 		}
 	}
+}
+
+void readCommand() {
+	printf("$ ");
+	char command[32];
+	cleanScan(command);
+	processCommand(command);
+}
+
+int processCommand(char *cmd) {
+	if(strlen(cmd) == 0) {
+		return 0;
+	}
+
+	if(!strcmp(cmd, "help") || !strcmp(cmd, "h")) {
+		help();
+		return 1;
+	} else if(!strcmp(cmd, "options") || !strcmp(cmd, "o")) {
+		options();
+		return 1;
+	} else if(!strcmp(cmd, "save") || !strcmp(cmd, "s")) {
+		save();
+		return 1;
+	} else if(!strcmp(cmd, "inventory") || !strcmp(cmd, "i")) {
+		exibitInventory();
+		return 1;
+	} else if(!strcmp(cmd, "jupiter") || !strcmp(cmd, "j")) {
+		jupiterWeb();
+		return 1;
+	} else if(!strcmp(cmd, "quit")) {
+		quit();
+		return 1;
+	}
+
+	return 0;
 }
 
 int getNumberOfLines(char *filePath) {
