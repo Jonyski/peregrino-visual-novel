@@ -60,7 +60,7 @@ void help() {
 	puts("map (m): veja o mapa da EACH");
 	puts("clear (c): limpe a tela");
 	puts("save (s): salve o jogo");
-	puts("quit (q): saia do jogo (;-;)");
+	puts("quit: saia do jogo (;-;)");
 }
 
 void options() {
