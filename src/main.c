@@ -26,6 +26,6 @@ int main(int argc, char const *argv[]) {
 
 	struct Narrator narrator = createNarrator(currContext.textPath);
 	for(int i = 0; i < narrator.amountOfLines - 1; i++) {
-		narrate(&narrator, false);
+		narrate(&narrator, true);
 	}
 }

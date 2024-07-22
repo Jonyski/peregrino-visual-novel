@@ -1,4 +1,5 @@
 #include "commands.h"
+#include "utils.h"
 
 void help() {
 	puts("para dar um comando digite o nome dele por extenso ou sua abreviação e então aperte enter:");
@@ -14,16 +15,38 @@ void help() {
 void options() {
 	// TO-DO: implement this function for real
 	puts("OPÇÕES: ");
+	pause;
 }
 
 void exibitInventory() {
 	// TO-DO: implement this function for real
 	puts("INVENTÁRIO: ");
+	pause;
 }
 
 void jupiterWeb() {
-	// TO-DO: implement this function for real
 	puts("https://uspdigital.usp.br/jupiterweb/gradeHoraria");
+
+	FILE *file;
+	char cronogram[256];
+	
+	#ifdef _WIN32
+		file = fopen("./assets/SI-cronogram.txt", "r");
+	#else
+		file = fopen("./assets/SI-cronogram.txt", "r");
+	#endif
+
+	if(file == NULL){
+		perror("Error opening file");
+		exit(1);
+	}
+
+	while(fgets(cronogram, sizeof(cronogram), file) != NULL){
+		printf("%s", cronogram);
+	}
+	
+	fclose(file);
+	pause;
 }
 
 void save() {
@@ -31,9 +54,11 @@ void save() {
 	puts("salvando o jogo...");
 	puts("...");
 	puts("JOGO SALVO");
+	pause;
 }
 
 void quit() {
 	// TO-DO: implement this function for real
 	puts("see you next time!");
+	pause;
 }

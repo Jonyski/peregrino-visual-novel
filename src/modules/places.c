@@ -8,10 +8,16 @@
 int printMap(){
 	FILE *file;
 	char mapa[1600];
-	file = fopen("/home/user/peregrino-visual-novel/assets/EACH-map.txt", "r");
+
+	#ifdef _WIN32
+		file = fopen("./assets/EACH-map.txt", "r");
+	#else
+		file = fopen("./assets/EACH-map.txt", "r");
+	#endif
+
 	if(file == NULL){
 		perror("Error opening file");
-		return EXIT_FAILURE;
+		exit(1);
 	}
 
 	while(fgets(mapa, sizeof(mapa), file) != NULL){
