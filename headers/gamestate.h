@@ -19,6 +19,7 @@ typedef enum {
 struct Context {
 	char textPath[64];     // the current file being read by the narrator
 	short int numOfInputs; // total number of inputs asked in the current file
+	short int inputsRead;  // how many inputs have already been read
 	short int currDay;     // the number of the day being played 
 	Activity currActivity; // true if the player is in a boss fight
 };

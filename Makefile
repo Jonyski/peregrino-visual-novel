@@ -6,7 +6,7 @@ run: main.out
 
 main.out: src/main.c $(wildcard src/modules/*.c)
 	@echo "Compiling the project"
-	@gcc $(CFLAGS) -g $^ -o $@ -I ./headers
+	@gcc $(CFLAGS) -g $^ -o $@ -I ./headers -lpthread
 
 clean:
 	@echo "Removing files..."

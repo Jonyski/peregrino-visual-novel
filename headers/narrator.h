@@ -13,13 +13,11 @@ struct Narrator {
 
 struct Narrator createNarrator(char *filePath); // instanciates a narrator
 void narrate(struct Narrator *, bool);  // narrates 1 line (the one indexed be narrator->nextLine)
-void getUserInput(char *, InputERR);      // reads the user input and comunicates any error
-InputERR processFreeFormInput(char *, int); // does with the input what is adequate according to the context
-char *preProcessLine();                 // 
+char *processLine(char *);              // cleans the line and makes necessary substitutions before it is printed
 void slowPrint(char *str);              // prints strings in a clean way
 void *checkInterrupt(void *arg);        // checks for interruptions that will fast-forward slowPrint()
-void printCentered(char *text); //print text in a centralized way
-void slowPrintCentered(char *text); //slowly, print text in a centralized way
+void printCentered(char *text);         //print text in a centralized way
+void slowPrintCentered(char *text);     //slowly, print text in a centralized way
 int getNumberOfLines(char *);           // finds the number of lines in a file
 
 #endif

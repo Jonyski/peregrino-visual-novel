@@ -12,6 +12,7 @@
 #include "utils.h"
 #include "userinput.h"
 #include "gamestate.h"
+#include "commands.h"
 
 volatile bool shouldSkip = false; // for allowing the slow printing to be fast-forwarded
 volatile bool ignoreSkip = false; // so that skip tentatives are ignored during input reading
@@ -61,40 +62,30 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 	char nextLine[strlen(narrator->script[narrator->nextLine] + 1)];
 	strcpy(nextLine, narrator->script[narrator->nextLine]);
 
-	bool isInput = false; // at first we assume the line doesn't ask for user input
-	int inputsRead = 0; // how many inputs have already been read
+	bool isInput = false; // signals if the current line is an input one
 	if(strncmp(nextLine, "<input>", 7) == 0) isInput = true;
 	
 	// altering the original line to clean it up and format it
-	// narrator->script[narrator->nextLine] = processLine(narrator->script[narrator->nextLine]);
+	free(narrator->script[narrator->nextLine]);
+	narrator->script[narrator->nextLine] = processLine(nextLine);
 
 	slowPrint(narrator->script[narrator->nextLine]);
-
-	// geting and processing user input
-	if(isInput) {
-		inputsRead++;
-		InputERR currError = NO_ERR;
-		ignoreSkip = true;
-		printf("> ");
-		// ask for it until it is formated correctly
-		do {
-			char userInput[USR_INPUT_MAX_SIZE];
-			getUserInput(userInput, currError);
-			currError = processFreeFormInput(userInput, inputsRead);
-		} while(currError != NO_ERR);
-		ignoreSkip = false;
+	if(narrator->nextLine == narrator->amountOfLines - 1) {
+		printf("\n"); // so that the last line of the script don't make thing weird
 	}
 
-	// pauses if the slowPrint wasn't skiped
-	if(!shouldSkip && !isInput) {
-		pause;
+	if(isInput) {
+		// geting and processing user input
+		readInput();
+	} else {
+		// getting and processing user command
+		readCommand();
 	}
 
 	free(narrator->script[narrator->nextLine]);
 	if(narrator->nextLine < narrator->amountOfLines){
 		narrator->nextLine++;
 	}
-
 }
 
 void slowPrint(char *str) {
@@ -128,41 +119,14 @@ void slowPrint(char *str) {
 		// between each character output sleep for 20~35 miliseconds
 		usleep((randomFloat * 15 + 20) * 1000);
 	}
-	shouldSkip = false;
-	pthread_join(checkInterruption, NULL);
+
+	if(shouldSkip == false) {
+		pthread_cancel(checkInterruption);
+	} else{
+		shouldSkip = false;
+		pthread_join(checkInterruption, NULL);
+	}
 	tcsetattr(STDIN_FILENO, TCSANOW, &old_conf);
-}
-
-void getUserInput(char *userInput, InputERR err) {
-	switch(err) {
-		case SHOULD_BE_STR:
-			printf("\npor favor, escreva apenas caracteres alfanuméricos:\n> ");
-			break;
-		case SHOULD_BE_INT:
-			printf("\nnão não não, isso não me parece um número, mim dê um número:\n> ");
-			break;
-		case TOO_LONG:
-			printf("\npassou de duas linhas eu nem leio, me dê algo mais curto:\n> ");
-			break;
-		case TOO_SHORT:
-			printf("\nisso é muito curto (foi o que ela disse), tente de novo:\n> ");
-			break;
-		case  NULL_INPUT:
-			printf("\nei, seu input não pode ser vazio:\n> ");
-			break;
-		case WRONG_ANSWER:
-			printf("\nnão, isso está errado, tente de novo:\n> ");
-			break;
-	}
-	cleanScan(userInput);
-}
-
-InputERR processFreeFormInput(char *input, int inputNum) {
-	if(currContext.currActivity == CLASS) {
-		if(currContext.currDay == 1) {
-			return processDay1ClassInput(input, inputNum);
-		}
-	}
 }
 
 void *checkInterrupt(void *arg) {
@@ -174,11 +138,17 @@ void *checkInterrupt(void *arg) {
 	}
 }
 
+char *processLine(char *line) {
+	char *inputMarker = "<input>";
+	// removing "<input>" from the beggining of input lines
+	return strReplace(line, "<input>", NULL);
+}
+
 int getNumberOfLines(char *filePath) {
 	FILE *file = fopen(filePath, "r");
-	char buffer[256];
+	char buffer[1024];
 	int numOfLines = 0;
-	while(fgets(buffer, 256, file)) {
+	while(fgets(buffer, 1024, file)) {
 		numOfLines++;
 	}
 	fclose(file);
