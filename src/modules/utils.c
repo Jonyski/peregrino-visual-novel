@@ -19,7 +19,7 @@ void trimWhitespace(char *str) {
 int cleanScan(char *dest) {
 	if (fgets(dest, USR_INPUT_MAX_SIZE, stdin) != NULL) {
         size_t len = strlen(dest);
-        if (len > 0 && dest[len - 1] == '\n') {
+        if (len > 0) {
             dest[len - 1] = '\0';
         }
         trimWhitespace(dest);

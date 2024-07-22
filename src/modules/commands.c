@@ -6,7 +6,7 @@
 void readCommand() {
 	int result = 1;
 	printf("$ ");
-	char command[32];
+	char command[USR_INPUT_MAX_SIZE];
 	while(result) {
 		cleanScan(command);
 		result = processCommand(command);

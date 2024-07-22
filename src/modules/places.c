@@ -325,7 +325,7 @@ void switchgrama(char *choice){
 //FUNCTIONS THAT REPRESENT THE PLACES
 
 void biblioteca(){
-	char choice[1];
+	char choice[16];
 	slowPrint("Após caminhar um pouco, você chegou na entrada da Biblioteca!\n");
 	slowPrint("Agora, o que fazer?\n");
 	switchbiblio(choice);
@@ -333,14 +333,14 @@ void biblioteca(){
 
 
 void queijo(){
-	char choice[1];
+	char choice[16];
 	slowPrint("Após caminhar um pouco, você chegou no Queijo!\n");
 	slowPrint("Agora, o que fazer?\n");
 	switchqueijo(choice);
 }
 
 void auditorios(){
-	char choice[1];
+	char choice[16];
 	slowPrint("Após caminhar um pouco, você chegou na entrada de acesso aos auditórios!\n");
 	slowPrint("Agora, aonde você quer ir?\n");
 	switchauditorios(choice);
@@ -348,7 +348,7 @@ void auditorios(){
 }
 
 void titanic(){
-	char choice[1];
+	char choice[16];
 	slowPrint("Após caminhar um pouco, você chegou no titanic!\n");
 	slowPrint("Para onde, agora?\n");
 	switchtitanic(choice);
@@ -356,7 +356,7 @@ void titanic(){
 }
 
 void grama(){
-	char choice[1];
+	char choice[16];
 	slowPrint("Após caminhar um pouco, você chegou na grama!\n");
 	slowPrint("Agora, o que fazer?\n");
 	switchgrama(choice);
