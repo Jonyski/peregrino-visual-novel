@@ -13,6 +13,7 @@
 #include "userinput.h"
 #include "gamestate.h"
 #include "commands.h"
+#include "minigame.h"
 
 volatile bool shouldSkip = false; // for allowing the slow printing to be fast-forwarded
 volatile bool ignoreSkip = false; // so that skip tentatives are ignored during input reading
@@ -64,6 +65,8 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 
 	bool isInput = false; // signals if the current line is an input one
 	if(strncmp(nextLine, "<input>", 7) == 0) isInput = true;
+
+  bool isMinigame = strncmp(nextLine, "<minigame>", 10)? false : true;
 	
 	// altering the original line to clean it up and format it
 	free(narrator->script[narrator->nextLine]);
@@ -77,6 +80,10 @@ void narrate(struct Narrator *narrator, bool shouldClear) {
 	if(isInput) {
 		// geting and processing user input
 		readInput();
+  } else if (isMinigame) {
+    currContext.currActivity = MINIGAME;
+    minigameManager(0); // TODO: create a minigame id system
+    currContext.currActivity = CLASS;
 	} else {
 		// getting and processing user command
 		readCommand();
@@ -144,6 +151,7 @@ char *processLine(char *line) {
 	
 	// tags to be substituted
 	char *inputTag = "<input>";
+  char *minigameTag = "<minigame>";
 	char *playerNameTag = "<P-name>";
 	char *playerSpeechTag = "<P>";
 	char *playerThoughtTag = "<P-T>";
@@ -167,6 +175,9 @@ char *processLine(char *line) {
 	temp = outputLine;
 	outputLine = strReplace(temp, playerThoughtTag, playerThought);
 	free(temp);
+  
+  temp = outputLine;
+  outputLine = strReplace(temp, minigameTag, NULL);
 
 	return outputLine;
 }
