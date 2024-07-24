@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "narrator.h"
+#include "player.h"
+#include "gamestate.h"
+#include "navigation.h"
 
 struct Player player;
 struct Context currContext;
@@ -28,10 +32,9 @@ int main(int argc, char const *argv[]) {
   currContext.miniGameId = 0;
   currContext.miniGameQuestionId = 1;
 
-  struct Narrator narrator = createNarrator(currContext.textPath);
-  for (int i = 0; i < narrator.amountOfLines; i++) {
-    narrate(&narrator, true);
-  }
-  printMap();
-  showNavigationOptions();
+	struct Narrator narrator = createNarrator(currContext.textPath);
+	for(int i = 0; i < narrator.amountOfLines; i++) {
+		narrate(&narrator, true);
+	}
+	navigateMap();
 }

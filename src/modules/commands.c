@@ -1,12 +1,12 @@
 #include <stdlib.h>
 #include "commands.h"
 #include "utils.h"
-#include "places.h"
+#include "navigation.h"
 
 void readCommand() {
 	int result = 1;
 	printf("$ ");
-	char command[32];
+	char command[USR_INPUT_MAX_SIZE];
 	while(result) {
 		cleanScan(command);
 		result = processCommand(command);
