@@ -30,7 +30,7 @@ int main(int argc, char const *argv[]) {
   currContext.inputsRead = 0;
   currContext.currActivity = CLASS;
   currContext.miniGameId = 0;
-  currContext.miniGameQuestionId = 1;
+  currContext.miniGameQuestionId = 0;
 
 	struct Narrator narrator = createNarrator(currContext.textPath);
 	for(int i = 0; i < narrator.amountOfLines; i++) {
