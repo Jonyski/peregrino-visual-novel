@@ -1,228 +1,231 @@
+#include "narrator.h"
+#include "commands.h"
+#include "gamestate.h"
+#include "minigame.h"
+#include "userinput.h"
+#include "utils.h"
+#include <pthread.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
-#include <pthread.h>
-#include <stdbool.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#include "narrator.h"
-#include "utils.h"
-#include "userinput.h"
-#include "gamestate.h"
-#include "commands.h"
-#include "minigame.h"
 
-volatile bool shouldSkip = false; // for allowing the slow printing to be fast-forwarded
-volatile bool ignoreSkip = false; // so that skip tentatives are ignored during input reading
+volatile bool shouldSkip =
+    false; // for allowing the slow printing to be fast-forwarded
+volatile bool ignoreSkip =
+    false; // so that skip tentatives are ignored during input reading
 
 struct Narrator createNarrator(char *textFilePath) {
-	struct Narrator narrator;
+  struct Narrator narrator;
 
-	int numOfLines = getNumberOfLines(textFilePath);
-	FILE *scriptFile = fopen(textFilePath, "r");
+  int numOfLines = getNumberOfLines(textFilePath);
+  FILE *scriptFile = fopen(textFilePath, "r");
 
-	if(scriptFile == NULL) {
-		exit(1); // failed to access script file
-	}
+  if (scriptFile == NULL) {
+    exit(1); // failed to access script file
+  }
 
-	char **script = malloc(numOfLines * sizeof(char*));
-	if (script == NULL) {
-		exit(1);
-	}
-	
-	char buffer[2048];
-	int currLine = 0;
-	while(fgets(buffer, sizeof(buffer), scriptFile) && currLine < numOfLines) {
-		script[currLine] = malloc(strlen(buffer) + 1);
-		if(script[currLine] == NULL) {
-			exit(1);
-		}
+  char **script = malloc(numOfLines * sizeof(char *));
+  if (script == NULL) {
+    exit(1);
+  }
 
-		strcpy(script[currLine], buffer);
-		script[currLine][strlen(buffer)] = '\0';
-		currLine++;
-	}
-	fclose(scriptFile);
+  char buffer[2048];
+  int currLine = 0;
+  while (fgets(buffer, sizeof(buffer), scriptFile) && currLine < numOfLines) {
+    script[currLine] = malloc(strlen(buffer) + 1);
+    if (script[currLine] == NULL) {
+      exit(1);
+    }
 
-	narrator.nextLine = 0;
-	narrator.amountOfLines = numOfLines;
-	narrator.script = script;
+    strcpy(script[currLine], buffer);
+    script[currLine][strlen(buffer)] = '\0';
+    currLine++;
+  }
+  fclose(scriptFile);
 
-	return narrator;
+  narrator.nextLine = 0;
+  narrator.amountOfLines = numOfLines;
+  narrator.script = script;
+
+  return narrator;
 }
 
 void narrate(struct Narrator *narrator, bool shouldClear) {
-	if(shouldClear) {
-		system("clear");
-	}
+  if (shouldClear) {
+    system("clear");
+  }
 
-	// saving a copy of the raw narration line
-	char nextLine[strlen(narrator->script[narrator->nextLine] + 1)];
-	strcpy(nextLine, narrator->script[narrator->nextLine]);
+  // saving a copy of the raw narration line
+  char nextLine[strlen(narrator->script[narrator->nextLine] + 1)];
+  strcpy(nextLine, narrator->script[narrator->nextLine]);
 
-	bool isInput = false; // signals if the current line is an input one
-	if(strncmp(nextLine, "<input>", 7) == 0) isInput = true;
+  bool isInput = false; // signals if the current line is an input one
+  if (strncmp(nextLine, "<input>", 7) == 0)
+    isInput = true;
 
-  bool isMinigame = strncmp(nextLine, "<minigame>", 10)? false : true;
-	
-	// altering the original line to clean it up and format it
-	free(narrator->script[narrator->nextLine]);
-	narrator->script[narrator->nextLine] = processLine(nextLine);
+  bool isMinigame = strncmp(nextLine, "<minigame>", 10) ? false : true;
 
-	slowPrint(narrator->script[narrator->nextLine]);
-	if(narrator->nextLine == narrator->amountOfLines - 1) {
-		printf("\n"); // so that the last line of the script don't make thing weird
-	}
+  // altering the original line to clean it up and format it
+  free(narrator->script[narrator->nextLine]);
+  narrator->script[narrator->nextLine] = processLine(nextLine);
 
-	if(isInput) {
-		// geting and processing user input
-		readInput();
+  slowPrint(narrator->script[narrator->nextLine]);
+  if (narrator->nextLine == narrator->amountOfLines - 1) {
+    printf("\n"); // so that the last line of the script don't make thing weird
+  }
+
+  if (isInput) {
+    // geting and processing user input
+    readInput();
   } else if (isMinigame) {
-    currContext.currActivity = MINIGAME;
-    minigameManager(0); // TODO: create a minigame id system
-    currContext.currActivity = CLASS;
-	} else {
-		// getting and processing user command
-		readCommand();
-	}
+    minigameManager();
+    currContext.miniGameId++; // Increment minigame count
+  } else {
+    // getting and processing user command
+    readCommand();
+  }
 
-	free(narrator->script[narrator->nextLine]);
-	if(narrator->nextLine < narrator->amountOfLines){
-		narrator->nextLine++;
-	}
+  free(narrator->script[narrator->nextLine]);
+  if (narrator->nextLine < narrator->amountOfLines) {
+    narrator->nextLine++;
+  }
 }
 
 void slowPrint(char *str) {
-	// changing terminal configurations to read input discreetly
-	struct termios old_conf, new_conf;
-	tcgetattr(STDIN_FILENO, &old_conf);
-	new_conf = old_conf;
-	new_conf.c_lflag &= ~(ICANON | ECHO); // turns off canon mode and input echo
-	tcsetattr(STDIN_FILENO, TCSANOW, &new_conf);
+  // changing terminal configurations to read input discreetly
+  struct termios old_conf, new_conf;
+  tcgetattr(STDIN_FILENO, &old_conf);
+  new_conf = old_conf;
+  new_conf.c_lflag &= ~(ICANON | ECHO); // turns off canon mode and input echo
+  tcsetattr(STDIN_FILENO, TCSANOW, &new_conf);
 
-	// creating a thread that may fast-forward the slow printing;
-	// this thread accesses the volatile variable defined in the beggining of this file
-	pthread_t checkInterruption;
-	pthread_create(&checkInterruption, NULL, checkInterrupt, NULL);
+  // creating a thread that may fast-forward the slow printing;
+  // this thread accesses the volatile variable defined in the beggining of this
+  // file
+  pthread_t checkInterruption;
+  pthread_create(&checkInterruption, NULL, checkInterrupt, NULL);
 
-	// reseting on every call of slowPrint
-	shouldSkip = false;
+  // reseting on every call of slowPrint
+  shouldSkip = false;
 
-	while(*str) {
-		// if the user presss a key we fast-forward the printing process
-		if(shouldSkip) {
-			printf("%s", str);
-			break;
-		}
-		putchar(*str++);
-		fflush(stdout);
-		// sleep a little longer on dots, this gives more dinamicity to the output
-		if(*(str - 1) == '.') {
-			usleep(300000);
-		}
-		// between each character output sleep for 20~35 miliseconds
-		usleep((randomFloat * 15 + 20) * 1000);
-	}
+  while (*str) {
+    // if the user presss a key we fast-forward the printing process
+    if (shouldSkip) {
+      printf("%s", str);
+      break;
+    }
+    putchar(*str++);
+    fflush(stdout);
+    // sleep a little longer on dots, this gives more dinamicity to the output
+    if (*(str - 1) == '.') {
+      usleep(300000);
+    }
+    // between each character output sleep for 20~35 miliseconds
+    usleep((randomFloat * 15 + 20) * 1000);
+  }
 
-	if(shouldSkip == false) {
-		pthread_cancel(checkInterruption);
-	} else{
-		shouldSkip = false;
-		pthread_join(checkInterruption, NULL);
-	}
-	tcsetattr(STDIN_FILENO, TCSANOW, &old_conf);
+  if (shouldSkip == false) {
+    pthread_cancel(checkInterruption);
+  } else {
+    shouldSkip = false;
+    pthread_join(checkInterruption, NULL);
+  }
+  tcsetattr(STDIN_FILENO, TCSANOW, &old_conf);
 }
 
 void *checkInterrupt(void *arg) {
-	// activates the shouldSkip flag when a key is pressed
-	while(!shouldSkip) {
-		if(getchar()) {
-			shouldSkip = true;
-		}
-	}
+  // activates the shouldSkip flag when a key is pressed
+  while (!shouldSkip) {
+    if (getchar()) {
+      shouldSkip = true;
+    }
+  }
 }
 
 char *processLine(char *line) {
-	char *outputLine; // the line that will recieve all processing changes
-	char *temp = line;       // variable to hold lines that will be free'd (since strReplace returns a new manually allocated str)
-	
-	// tags to be substituted
-	char *inputTag = "<input>";
+  char *outputLine;  // the line that will recieve all processing changes
+  char *temp = line; // variable to hold lines that will be free'd (since
+                     // strReplace returns a new manually allocated str)
+
+  // tags to be substituted
+  char *inputTag = "<input>";
   char *minigameTag = "<minigame>";
-	char *playerNameTag = "<P-name>";
-	char *playerSpeechTag = "<P>";
-	char *playerThoughtTag = "<P-T>";
+  char *playerNameTag = "<P-name>";
+  char *playerSpeechTag = "<P>";
+  char *playerThoughtTag = "<P-T>";
 
-	// strings to replace the tags with
-	char playerSpeech[42];
-	strcpy(playerSpeech, player.name);
-	strcat(playerSpeech, ": ");
-	char playerThought[42];
-	strcpy(playerThought, player.name);
-	strcat(playerThought, ": ");
+  // strings to replace the tags with
+  char playerSpeech[42];
+  strcpy(playerSpeech, player.name);
+  strcat(playerSpeech, ": ");
+  char playerThought[42];
+  strcpy(playerThought, player.name);
+  strcat(playerThought, ": ");
 
-	// removing "<input>" from the beggining of input lines
-	outputLine = strReplace(temp, inputTag, NULL);
-	temp = outputLine;
-	outputLine = strReplace(temp, playerNameTag, player.name);
-	free(temp);
-	temp = outputLine;
-	outputLine = strReplace(temp, playerSpeechTag, playerSpeech);
-	free(temp);
-	temp = outputLine;
-	outputLine = strReplace(temp, playerThoughtTag, playerThought);
-	free(temp);
-  
+  // removing "<input>" from the beggining of input lines
+  outputLine = strReplace(temp, inputTag, NULL);
+  temp = outputLine;
+  outputLine = strReplace(temp, playerNameTag, player.name);
+  free(temp);
+  temp = outputLine;
+  outputLine = strReplace(temp, playerSpeechTag, playerSpeech);
+  free(temp);
+  temp = outputLine;
+  outputLine = strReplace(temp, playerThoughtTag, playerThought);
+  free(temp);
+
   temp = outputLine;
   outputLine = strReplace(temp, minigameTag, NULL);
+  free(temp);
 
-	return outputLine;
+  return outputLine;
 }
 
 int getNumberOfLines(char *filePath) {
-	FILE *file = fopen(filePath, "r");
-	char buffer[1024];
-	int numOfLines = 0;
-	while(fgets(buffer, 1024, file)) {
-		numOfLines++;
-	}
-	fclose(file);
-	return numOfLines;
+  FILE *file = fopen(filePath, "r");
+  char buffer[1024];
+  int numOfLines = 0;
+  while (fgets(buffer, 1024, file)) {
+    numOfLines++;
+  }
+  fclose(file);
+  return numOfLines;
 }
 
 void printCentered(char *text) {
-	struct winsize w;
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	int width = w.ws_col;
+  struct winsize w;
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+  int width = w.ws_col;
 
-	int textLength = strlen(text);
-	int padding = (width - textLength) / 2;
+  int textLength = strlen(text);
+  int padding = (width - textLength) / 2;
 
-	// Print leading spaces
-	for (int i = 0; i < padding; i++) {
-		printf(" ");
-	}
+  // Print leading spaces
+  for (int i = 0; i < padding; i++) {
+    printf(" ");
+  }
 
-	// Print the actual text
-	printf("%s\n", text);
+  // Print the actual text
+  printf("%s\n", text);
 }
 
 void slowPrintCentered(char *text) {
-	struct winsize w;
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-	int width = w.ws_col;
+  struct winsize w;
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+  int width = w.ws_col;
 
-	int textLength = strlen(text);
-	int padding = (width - textLength) / 2;
+  int textLength = strlen(text);
+  int padding = (width - textLength) / 2;
 
-	// Print leading spaces
-	for (int i = 0; i < padding; i++) {
-		printf(" ");
-	}
+  // Print leading spaces
+  for (int i = 0; i < padding; i++) {
+    printf(" ");
+  }
 
-	// Print the actual text
-	slowPrint(text);
+  // Print the actual text
+  slowPrint(text);
 }

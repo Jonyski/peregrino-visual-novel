@@ -13,7 +13,7 @@ void readInput() {
   do {
     char userInput[USR_INPUT_MAX_SIZE];
     getUserInput(userInput, currError);
-    currError = processFreeFormInput(userInput, currContext.inputsRead);
+    currError = processFreeFormInput(userInput);
   } while (currError != NO_ERR);
 }
 
@@ -44,16 +44,23 @@ void getUserInput(char *userInput, InputERR err) {
   cleanScan(userInput);
 }
 
-InputERR processFreeFormInput(char *input, int inputNum) {
+InputERR processFreeFormInput(char *input) {
   if (currContext.currActivity == CLASS) {
     if (currContext.currDay == 1) {
-      return processDay1ClassInput(input, inputNum);
+      return processDay1ClassInput(input, currContext.inputsRead);
     }
   } else if (currContext.currActivity == MINIGAME) {
-    if (currContext.currDay == 1) {
-      return processCalcGame(input);
+    switch (currContext.miniGameId) {
+    case 0:
+      return processCalcGame(input, currContext.miniGameQuestionId);
+      break;
+    case 1:
+      return processIpGame(input, currContext.miniGameQuestionId);
+      break;
     }
   }
+
+  return NO_ERR;
 }
 
 InputERR processDay1ClassInput(char *input, int inputNum) {
@@ -65,11 +72,10 @@ InputERR processDay1ClassInput(char *input, int inputNum) {
     if (strlen(input) > NAME_SIZE_LIMIT)
       return TOO_LONG;
     strcpy(player.name, input);
-    return NO_ERR;
   } else if (inputNum == 2) {
     // Calculus classroom number handling
     if (strcmp(input, "219"))
       return WRONG_ANSWER;
-    return NO_ERR;
   }
+  return NO_ERR;
 }
