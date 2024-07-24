@@ -1,5 +1,9 @@
-#include <stdlib.h>
 #include "utils.h"
+#include "userinput.h"
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void trimWhitespace(char *str) {
 	char *start = str;
@@ -31,7 +35,9 @@ int cleanScan(char *dest) {
 	return strlen(dest);
 }
 
-// copy-pasted from stackoverflow: https://stackoverflow.com/questions/779875/what-function-is-to-replace-a-substring-from-a-string-in-c
+
+// copy-pasted from stackoverflow:
+// https://stackoverflow.com/questions/779875/what-function-is-to-replace-a-substring-from-a-string-in-c
 char *strReplace(char *orig, char *rep, char *with) {
 	char *result;  // the return string
 	char *ins;     // the next insert point
