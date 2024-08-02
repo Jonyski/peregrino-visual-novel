@@ -23,8 +23,7 @@ void getUserInput(char *userInput, InputERR err) {
     printf("\npor favor, escreva apenas caracteres alfanuméricos:\n> ");
     break;
   case SHOULD_BE_INT:
-    printf(
-        "\nnão não não, isso não me parece um número, mim dê um número:\n> ");
+    printf("\nnão não não, isso não me parece um número, mim dê um número:\n> ");
     break;
   case TOO_LONG:
     printf("\npassou de duas linhas eu nem leio, me dê algo mais curto:\n> ");
