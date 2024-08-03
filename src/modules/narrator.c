@@ -13,10 +13,8 @@
 #include <termios.h>
 #include <unistd.h>
 
-volatile bool shouldSkip =
-    false; // for allowing the slow printing to be fast-forwarded
-volatile bool ignoreSkip =
-    false; // so that skip tentatives are ignored during input reading
+volatile bool shouldSkip = false; // for allowing the slow printing to be fast-forwarded
+volatile bool ignoreSkip = false; // so that skip tentatives are ignored during input reading
 
 struct Narrator createNarrator(char *textFilePath) {
   struct Narrator narrator;

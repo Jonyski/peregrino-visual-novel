@@ -11,6 +11,8 @@
 #include "gamestate.h"
 #include "navigation.h"
 #include "utils.h"
+#include "userinput.h"
+#include "tests.h"
 
 struct Player player;
 struct Context currContext;
@@ -21,8 +23,13 @@ void startGame();
 int main(int argc, char const *argv[]) {
   setlocale(LC_ALL, "");
   srand(time(NULL));
-  gameMenu();
-  startGame();
+
+  if(argc > 1) {
+    testFeature(argv[1]);
+  } else {
+    gameMenu();
+    startGame();
+  }
 }
 
 void gameMenu() {
@@ -78,7 +85,7 @@ void gameMenu() {
   usleep(600000);
 
   printf(" Aperte ENTER para começar...\n");
-  char trash[16];
+  char trash[USR_INPUT_MAX_SIZE];
   cleanScan(trash);
 }
 
