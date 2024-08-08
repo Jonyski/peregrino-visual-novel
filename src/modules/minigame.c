@@ -9,6 +9,7 @@ void calc_game();
 void ip_game();
 
 void minigameManager() {
+  currContext.currActivity = MINIGAME;
   switch (currContext.miniGameId) {
   case 0:
     calc_game();
@@ -20,6 +21,7 @@ void minigameManager() {
     printf("Unimplemented game id\n");
     break;
   }
+  currContext.currActivity = CLASS;
 }
 
 void ip_game() {
@@ -47,7 +49,7 @@ void calc_game() {
   printf("Resposta correta!\n");
 
   printf("---SEGUNDA QUESTÃO---\n\n");
-  printf("");
+  printf(" ");
 
   readInput();
 
@@ -55,7 +57,7 @@ void calc_game() {
   printf("Resposta correta!\n");
 
   printf("---TERCEIRA QUESTÃO---\n\n");
-  printf("");
+  printf(" ");
 
   readInput();
 

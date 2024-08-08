@@ -8,7 +8,7 @@
 typedef enum {
   CLASS,
   NAVIGATION,
-  BOSS_FIGHT,
+  BOSSFIGHT,
   MISSION,
   MINIGAME,
   PAUSED
