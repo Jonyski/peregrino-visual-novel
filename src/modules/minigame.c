@@ -49,7 +49,7 @@ void calc_game() {
   printf("Resposta correta!\n");
 
   printf("---SEGUNDA QUESTÃO---\n\n");
-  printf("");
+  printf(" ");
 
   readInput();
 
@@ -57,7 +57,7 @@ void calc_game() {
   printf("Resposta correta!\n");
 
   printf("---TERCEIRA QUESTÃO---\n\n");
-  printf("");
+  printf(" ");
 
   readInput();
 
