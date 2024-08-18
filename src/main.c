@@ -11,7 +11,7 @@
 #include "gamestate.h"
 #include "navigation.h"
 #include "utils.h"
-#include "userinput.h"
+#include "IO.h"
 #include "tests.h"
 
 struct Player player;

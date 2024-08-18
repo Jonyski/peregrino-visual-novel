@@ -2,7 +2,7 @@
 #include "commands.h"
 #include "utils.h"
 #include "navigation.h"
-#include "userinput.h"
+#include "IO.h"
 
 void readCommand() {
 	int result = 1;
