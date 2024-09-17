@@ -43,8 +43,8 @@ typedef struct place{
 extern place_t each;
 
 
-void initialize_places();
-int navigatetest(place_t place);
+void initializePlaces();
+int navigate(place_t place);
 int navigateMap();            // loops the navigation cycle
 int printMap();               // exibits the map
 void showNavigationOptions(); // shows the each-general navigation options

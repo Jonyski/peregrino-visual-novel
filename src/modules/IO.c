@@ -134,6 +134,7 @@ void *checkInterrupt(void *arg) {
       shouldSkip = true;
     }
   }
+  return NULL;
 }
 
 void printCentered(char *text) {

@@ -41,7 +41,8 @@ void testNarration() {
 
 void testNavigation() {
 	//currContext.currActivity = NAVIGATION;
-	navigatetest(each);
+	initializePlaces();
+	navigate(each);
 }
 
 void testMinigames() {

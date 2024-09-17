@@ -203,7 +203,7 @@ place_t each = {
 	.numSubPlaces = 7
 };
 
-void initialize_places(){
+void initializePlaces(){
 	biblioteca.father = &each;
 		banheirofb.father = &biblioteca;
 		banheiromb.father = &biblioteca;
@@ -235,16 +235,15 @@ void initialize_places(){
 	auditorio.father = &each;
 }
 
-int navigatetest(place_t place){
-	initialize_places();
-
+int navigate(place_t place){
 	printf("Você está em %s. Para onde quer ir agora?\n", place.name);
 	if(place.numSubPlaces != 0){
 		for(int i=0; i<place.numSubPlaces; i++){
 			printf("%d) %s\n", i+1, place.subPlaces[i]->name);
 		}
-		if(place.father != NULL) printf("%d) Ir para outro lugar", place.numSubPlaces + 1);
+		if(place.father != NULL) printf("%d) Ir para outro lugar\n", place.numSubPlaces + 1);
 	} else {
+		// TODO: read the terminal-place's script
 		printf("Morreu\n");
 		return 0;
 	}
@@ -253,12 +252,9 @@ int navigatetest(place_t place){
 	scanf("%d", &choice);
 
 	if(choice == place.numSubPlaces + 1 && place.father != NULL){
-
-		navigatetest(*place.father);
-
+		navigate(*place.father);
 	} else {
-
-		navigatetest(*place.subPlaces[choice - 1]);
+		navigate(*place.subPlaces[choice - 1]);
 	}
 
 	return 1;

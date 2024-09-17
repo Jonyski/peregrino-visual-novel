@@ -93,6 +93,7 @@ void gameMenu() {
 void startGame() {
   // TODO: make a createContext Function
   player = createPlayer();
+  initializePlaces();
   #ifdef _WIN32
     strcpy(currContext.textPath, ".\\texts\\day1-script.txt");
   #else
@@ -109,5 +110,5 @@ void startGame() {
   for(int i = 0; i < narrator.amountOfLines; i++) {
     narrate(&narrator, true);
   }
-  navigatetest(each);
+  navigate(each);
 }
