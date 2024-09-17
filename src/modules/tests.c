@@ -40,8 +40,8 @@ void testNarration() {
 }
 
 void testNavigation() {
-	currContext.currActivity = NAVIGATION;
-	navigateMap();
+	//currContext.currActivity = NAVIGATION;
+	navigatetest(each);
 }
 
 void testMinigames() {
