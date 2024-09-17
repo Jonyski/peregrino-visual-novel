@@ -1,5 +1,5 @@
 #include "utils.h"
-#include "userinput.h"
+#include "IO.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,22 +19,6 @@ void trimWhitespace(char *str) {
 
 	*(end + 1) = '\0';
 }
-
-int cleanScan(char *dest) {
-	if (fgets(dest, USR_INPUT_MAX_SIZE, stdin) != NULL) {
-		size_t len = strlen(dest);
-		if (len > 0 && dest[len - 1] == '\n') {
-			dest[len - 1] = '\0';
-		} else {
-			// Clear the input buffer if input exceeds USR_INPUT_MAX_SIZE
-			int ch;
-			while ((ch = getchar()) != '\n' && ch != EOF);
-		}
-		trimWhitespace(dest);
-	}
-	return strlen(dest);
-}
-
 
 // copy-pasted from stackoverflow:
 // https://stackoverflow.com/questions/779875/what-function-is-to-replace-a-substring-from-a-string-in-c

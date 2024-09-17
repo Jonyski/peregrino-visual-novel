@@ -1,12 +1,9 @@
 #include "minigame.h"
 #include "gamestate.h"
 #include "stdlib.h"
-#include "userinput.h"
+#include "IO.h"
 #include <stdio.h>
 #include <string.h>
-
-void calc_game();
-void ip_game();
 
 void minigameManager() {
 	currContext.currActivity = MINIGAME;

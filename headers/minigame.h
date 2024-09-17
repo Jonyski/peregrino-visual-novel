@@ -1,12 +1,10 @@
 #ifndef MINIGAME_H
 #define MINIGAME_H
 
-#include "userinput.h"
+#include "IO.h"
 
 void minigameManager();
-
-InputERR processCalcGame(char *input, short int question_num);
-
-InputERR processIpGame(char *input, short int question_num);
+void calc_game();
+void ip_game();
 
 #endif // MINIGAME_H
