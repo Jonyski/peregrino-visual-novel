@@ -4,3 +4,4 @@
 .vscode
 .clangd
 compile_flags.txt
+.clang-format
